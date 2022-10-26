@@ -18,8 +18,8 @@ BLACK = (0,0,0)
 game = GameState()
 WIDTH = 600
 HEIGHT = 400
-BALL_EDGE = .035
-BALL_HEIGHT = (3*BALL_EDGE/2)
+BALL_WIDTH = .025
+BALL_HEIGHT = BALL_WIDTH * 3 / 2
 PAD_WIDTH = .015
 PAD_HEIGHT = .2
 HALF_PAD_WIDTH = PAD_WIDTH / 2
@@ -87,24 +87,23 @@ def draw(canvas):
     game.ball_pos[1] += game.ball_vel[1]
 
     #draw paddles and ball
-    #pygame.draw.circle(canvas, WHITE, [frac_to_px(game.ball_pos[0], WIDTH), frac_to_px(game.ball_pos[1], HEIGHT)], 20, 0)
     pygame.draw.rect(canvas, WHITE, (
-        frac_to_px(game.ball_pos[0] - BALL_EDGE / 2, WIDTH), #left
-        frac_to_px(game.ball_pos[1] - BALL_EDGE / 2, HEIGHT), #top
-        frac_to_px(BALL_EDGE, WIDTH),#width
-        frac_to_px(BALL_EDGE, HEIGHT)#height
+        frac_to_px(game.ball_pos[0] - BALL_WIDTH / 2, WIDTH), #left
+        frac_to_px(game.ball_pos[1] - BALL_HEIGHT / 2, HEIGHT), #top
+        frac_to_px(BALL_WIDTH, WIDTH),#width
+        frac_to_px(BALL_HEIGHT, HEIGHT)#height
     ))
     pygame.draw.polygon(canvas, WHITE,[[0, frac_to_px(game.paddle_positions[0] - HALF_PAD_HEIGHT, HEIGHT)], [0, frac_to_px(game.paddle_positions[0] + HALF_PAD_HEIGHT, HEIGHT)], [frac_to_px(PAD_WIDTH, WIDTH), frac_to_px(game.paddle_positions[0] + HALF_PAD_HEIGHT, HEIGHT)], [frac_to_px(PAD_WIDTH, WIDTH), frac_to_px(game.paddle_positions[0] - HALF_PAD_HEIGHT, HEIGHT)]], 0)
     pygame.draw.polygon(canvas, WHITE, [[frac_to_px(1-PAD_WIDTH, WIDTH), frac_to_px(game.paddle_positions[1] - HALF_PAD_HEIGHT, HEIGHT)], [frac_to_px(1-PAD_WIDTH, WIDTH), frac_to_px(game.paddle_positions[1] + HALF_PAD_HEIGHT, HEIGHT)], [frac_to_px(1, WIDTH), frac_to_px(game.paddle_positions[1] + HALF_PAD_HEIGHT, HEIGHT)], [frac_to_px(1, WIDTH), frac_to_px(game.paddle_positions[1] - HALF_PAD_HEIGHT, HEIGHT)]], 0)
 
     #ball collision check on top and bottom walls
-    if game.ball_pos[1] <= BALL_EDGE/2:
+    if game.ball_pos[1] <= BALL_HEIGHT/2:
         game.ball_vel[1] = - game.ball_vel[1]
-    if game.ball_pos[1] >= 1 - BALL_EDGE/2:
+    if game.ball_pos[1] >= 1 - BALL_HEIGHT/2:
         game.ball_vel[1] = - game.ball_vel[1]
     
     #ball collison check on gutters or paddles
-    if game.ball_pos[0] <= BALL_EDGE/2 + PAD_WIDTH:
+    if game.ball_pos[0] <= BALL_WIDTH/2 + PAD_WIDTH:
         if (game.ball_pos[1] <= game.paddle_positions[0] + HALF_PAD_HEIGHT
             and game.ball_pos[1] >= game.paddle_positions[0] - HALF_PAD_HEIGHT):
             game.ball_vel[0] = -game.ball_vel[0]
@@ -113,7 +112,7 @@ def draw(canvas):
         else:
             game.score[1] += 1
             ball_init(True)
-    elif game.ball_pos[0] >= 1 - (BALL_EDGE/2 + PAD_WIDTH):
+    elif game.ball_pos[0] >= 1 - (BALL_WIDTH/2 + PAD_WIDTH):
         if (game.ball_pos[1] <= game.paddle_positions[1] + HALF_PAD_HEIGHT
             and game.ball_pos[1] >= game.paddle_positions[1] - HALF_PAD_HEIGHT):
             game.ball_vel[0] = -game.ball_vel[0]
