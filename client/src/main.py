@@ -8,7 +8,7 @@ from helpers.convert import *
 
 
 pygame.init()
-fps = pygame.time.Clock()
+clock = pygame.time.Clock()
 
 #colors
 WHITE = (255,255,255)
@@ -29,7 +29,7 @@ paddle2_vel = 0
 paddle1_x = HALF_PAD_WIDTH
 paddle2_x = 1 - HALF_PAD_WIDTH
 
-#canvas declaration
+#surface declaration
 window = pygame.display.set_mode((WIDTH, HEIGHT), RESIZABLE, 32)
 pygame.display.set_caption('NetPong')
 
@@ -59,13 +59,35 @@ def init():
         ball_init(False)
 
 
-#draw function of canvas
-def draw(canvas):
-    canvas.fill(BLACK)
-    pygame.draw.line(canvas, WHITE, [WIDTH / 2, 0],[WIDTH / 2, HEIGHT], 1)
-    pygame.draw.line(canvas, WHITE, [PAD_WIDTH, 0],[PAD_WIDTH, HEIGHT], 1)
-    pygame.draw.line(canvas, WHITE, [WIDTH - PAD_WIDTH, 0],[WIDTH - PAD_WIDTH, HEIGHT], 1)
-    pygame.draw.circle(canvas, WHITE, [WIDTH//2, HEIGHT//2], 70, 1)
+def draw_menu(surface):
+    surface.fill(BLACK)
+    # Start button
+    button_width = .4
+    button_height = .15
+    border_width = .008
+    pygame.draw.rect(surface, WHITE, (
+        frac_to_px(.5 - button_width / 2, WIDTH),
+        frac_to_px(.5 - button_height / 2, HEIGHT),
+        frac_to_px(button_width, WIDTH),
+        frac_to_px(button_height, HEIGHT)))
+    pygame.draw.rect(surface, BLACK, (
+        frac_to_px((.5 - button_width / 2) + border_width, WIDTH),
+        frac_to_px((.5 - button_height / 2) + border_width * 1.5, HEIGHT),
+        frac_to_px(button_width - 2 * border_width, WIDTH),
+        frac_to_px(button_height - 3 * border_width, HEIGHT)))
+
+    font_height = .1
+    myfont1 = pygame.font.SysFont("agencyfb", int(frac_to_px(font_height, HEIGHT)), bold=True)
+    label1 = myfont1.render("START", 1, WHITE)
+    surface.blit(label1, (frac_to_px(.42, WIDTH), frac_to_px(.47, HEIGHT)))
+
+#draw function of surface
+def draw_game(surface):
+    surface.fill(BLACK)
+    pygame.draw.line(surface, WHITE, [WIDTH / 2, 0],[WIDTH / 2, HEIGHT], 1)
+    pygame.draw.line(surface, WHITE, [PAD_WIDTH, 0],[PAD_WIDTH, HEIGHT], 1)
+    pygame.draw.line(surface, WHITE, [WIDTH - PAD_WIDTH, 0],[WIDTH - PAD_WIDTH, HEIGHT], 1)
+    pygame.draw.circle(surface, WHITE, [WIDTH//2, HEIGHT//2], 70, 1)
 
     # update paddle's vertical position, keep paddle on the screen
     if game.paddle_positions[0] > HALF_PAD_HEIGHT and game.paddle_positions[0] < 1 - HALF_PAD_HEIGHT:
@@ -87,14 +109,24 @@ def draw(canvas):
     game.ball_pos[1] += game.ball_vel[1]
 
     #draw paddles and ball
-    pygame.draw.rect(canvas, WHITE, (
+    pygame.draw.rect(surface, WHITE, (
         frac_to_px(game.ball_pos[0] - BALL_WIDTH / 2, WIDTH), #left
         frac_to_px(game.ball_pos[1] - BALL_HEIGHT / 2, HEIGHT), #top
         frac_to_px(BALL_WIDTH, WIDTH),#width
         frac_to_px(BALL_HEIGHT, HEIGHT)#height
     ))
-    pygame.draw.polygon(canvas, WHITE,[[0, frac_to_px(game.paddle_positions[0] - HALF_PAD_HEIGHT, HEIGHT)], [0, frac_to_px(game.paddle_positions[0] + HALF_PAD_HEIGHT, HEIGHT)], [frac_to_px(PAD_WIDTH, WIDTH), frac_to_px(game.paddle_positions[0] + HALF_PAD_HEIGHT, HEIGHT)], [frac_to_px(PAD_WIDTH, WIDTH), frac_to_px(game.paddle_positions[0] - HALF_PAD_HEIGHT, HEIGHT)]], 0)
-    pygame.draw.polygon(canvas, WHITE, [[frac_to_px(1-PAD_WIDTH, WIDTH), frac_to_px(game.paddle_positions[1] - HALF_PAD_HEIGHT, HEIGHT)], [frac_to_px(1-PAD_WIDTH, WIDTH), frac_to_px(game.paddle_positions[1] + HALF_PAD_HEIGHT, HEIGHT)], [frac_to_px(1, WIDTH), frac_to_px(game.paddle_positions[1] + HALF_PAD_HEIGHT, HEIGHT)], [frac_to_px(1, WIDTH), frac_to_px(game.paddle_positions[1] - HALF_PAD_HEIGHT, HEIGHT)]], 0)
+    pygame.draw.polygon(surface, WHITE,[
+            [0, frac_to_px(game.paddle_positions[0] - HALF_PAD_HEIGHT, HEIGHT)],
+            [0, frac_to_px(game.paddle_positions[0] + HALF_PAD_HEIGHT, HEIGHT)],
+            [frac_to_px(PAD_WIDTH, WIDTH), frac_to_px(game.paddle_positions[0] + HALF_PAD_HEIGHT, HEIGHT)],
+            [frac_to_px(PAD_WIDTH, WIDTH), frac_to_px(game.paddle_positions[0] - HALF_PAD_HEIGHT, HEIGHT)]
+        ], 0)
+    pygame.draw.polygon(surface, WHITE, [
+            [frac_to_px(1-PAD_WIDTH, WIDTH), frac_to_px(game.paddle_positions[1] - HALF_PAD_HEIGHT, HEIGHT)],
+            [frac_to_px(1-PAD_WIDTH, WIDTH), frac_to_px(game.paddle_positions[1] + HALF_PAD_HEIGHT, HEIGHT)],
+            [frac_to_px(1, WIDTH), frac_to_px(game.paddle_positions[1] + HALF_PAD_HEIGHT, HEIGHT)],
+            [frac_to_px(1, WIDTH), frac_to_px(game.paddle_positions[1] - HALF_PAD_HEIGHT, HEIGHT)]
+        ],0)
 
     #ball collision check on top and bottom walls
     if game.ball_pos[1] <= BALL_HEIGHT/2:
@@ -125,11 +157,11 @@ def draw(canvas):
     #update scores
     myfont1 = pygame.font.SysFont("agencyfb", 20)
     label1 = myfont1.render("Score "+str(game.score[0]), 1, WHITE)
-    canvas.blit(label1, (50,20))
+    surface.blit(label1, (50,20))
 
     myfont2 = pygame.font.SysFont("agencyfb", 20)
     label2 = myfont2.render("Score "+str(game.score[1]), 1, WHITE)
-    canvas.blit(label2, (470,20))  
+    surface.blit(label2, (470,20))  
     
     
 #keydown handler
@@ -154,13 +186,34 @@ def keyup(event):
     elif event.key in (K_UP, K_DOWN):
         paddle2_vel = 0
 
-init()
 
+cont = False
+while not cont:
+
+    draw_menu(window)
+
+    for event in pygame.event.get():
+        if event.type == KEYDOWN and (event.key == K_RETURN or event.key == K_SPACE):
+            cont = True
+        elif event.type == QUIT:
+            pygame.quit()
+            sys.exit()
+        elif event.type == VIDEORESIZE:
+            if (window.get_width() / window.get_height() >= 3 / 2):
+                HEIGHT = window.get_height()
+                WIDTH = int(window.get_height() * 3 / 2)
+            else:
+                WIDTH = window.get_width()
+                HEIGHT = int(window.get_width() * 2 / 3)
+            
+    pygame.display.update()
+    clock.tick(30)
+
+init()
 
 #game loop
 while True:
-
-    draw(window)
+    draw_game(window)
 
     for event in pygame.event.get():
 
@@ -178,6 +231,6 @@ while True:
             else:
                 WIDTH = window.get_width()
                 HEIGHT = int(window.get_width() * 2 / 3)
-            
+        
     pygame.display.update()
-    fps.tick(60)
+    clock.tick(60)
