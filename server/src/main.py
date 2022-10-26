@@ -1,11 +1,14 @@
 import socket
-from multiprocessing import Process
+from multiprocessing import Process, Manager
 from game import room
 import random
 
+idx = []
 
-def start(id):
-    room.start(id)
+
+def start(id, state):
+    state.append(100+id)
+    room.start(id, state)
 
 
 if __name__ == '__main__':
@@ -17,6 +20,9 @@ if __name__ == '__main__':
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((UDP_IP, UDP_PORT))
 
+    manager = Manager()
+    state = manager.dict()
+
     while True:
         data, addr = sock.recvfrom(1024)
         message = data.decode('utf-8')
@@ -24,6 +30,13 @@ if __name__ == '__main__':
         if message.strip() == 'start':
             print('start recv')
             id = random.randint(1, 10)
-            p = Process(target=start, args=(id,))
+            idx.append(id)
+            state[id] = manager.list()
+            state[id].append(id)
+            p = Process(target=start, args=(id, state[id]))
             p.start()
-            p.join()
+        elif message.strip() == 'add':
+            ran = random.randint(1, 100)
+            id = idx[0]
+            state[id].append(ran)
+            print(state)
