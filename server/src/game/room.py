@@ -14,10 +14,8 @@ room_state = {
 def start(id, state, socket):
     print(f'starting game room %s' % id)
     room_state["room_id"] = id
-    addr = state[0]
-    print(addr)
     res = json.dumps(room_state)
-    socket.sendto(str.encode(res), addr)
+    socket.sendto(str.encode(res), state['addr'])
     run(id, state, socket)
 
 
