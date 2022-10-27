@@ -35,10 +35,9 @@ if __name__ == '__main__':
             id = random.randint(1, 10)
             idx.append(id)
             state[id] = manager.list()
-            state[id].append(id)
+            state[id].append(addr)
             p = Process(target=start, args=(id, state[id]))
             p.start()
-            sock.sendto('thanks', addr)
         elif message.strip() == 'add':
             ran = random.randint(1, 100)
             id = idx[0]
