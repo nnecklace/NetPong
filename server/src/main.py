@@ -7,9 +7,8 @@ import json
 idx = []
 
 
-def start(id, state):
-    state.append(100+id)
-    room.start(id, state)
+def start(id, state, socket):
+    room.start(id, state, socket)
 
 
 if __name__ == '__main__':
@@ -36,7 +35,7 @@ if __name__ == '__main__':
             idx.append(id)
             state[id] = manager.list()
             state[id].append(addr)
-            p = Process(target=start, args=(id, state[id]))
+            p = Process(target=start, args=(id, state[id], sock))
             p.start()
         elif message.strip() == 'add':
             ran = random.randint(1, 100)

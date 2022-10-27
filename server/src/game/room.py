@@ -1,6 +1,5 @@
 import time
 import random
-import socket
 import json
 
 room_state = {
@@ -11,15 +10,14 @@ room_state = {
     "score": (0, 0)
 }
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-
-def start(id, state):
+def start(id, state, socket):
     print(f'starting game room %s' % id)
     room_state["room_id"] = id
     addr = state[0]
+    print(addr)
     res = json.dumps(room_state)
-    sock.sendto(str.encode(res), addr)
+    socket.sendto(str.encode(res), addr)
     run(state)
 
 
