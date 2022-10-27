@@ -1,11 +1,15 @@
 import socket
-from multiprocessing import Process
+from multiprocessing import Process, Manager
 from game import room
 import random
+import json
+
+idx = []
 
 
-def start(id):
-    room.start(id)
+def start(id, state):
+    state.append(100+id)
+    room.start(id, state)
 
 
 if __name__ == '__main__':
@@ -15,15 +19,28 @@ if __name__ == '__main__':
     UDP_PORT = 5005
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind((UDP_IP, UDP_PORT))
+    sock.bind(('', UDP_PORT))
+
+    manager = Manager()
+    state = manager.dict()
 
     while True:
         data, addr = sock.recvfrom(1024)
-        message = data.decode('utf-8')
-        print("message %s" % message)
+        packet = data.decode('utf-8')
+        print("message %s" % packet)
+        packet = json.loads(packet)
+        message = packet['message']
         if message.strip() == 'start':
             print('start recv')
             id = random.randint(1, 10)
-            p = Process(target=start, args=(id,))
+            idx.append(id)
+            state[id] = manager.list()
+            state[id].append(id)
+            p = Process(target=start, args=(id, state[id]))
             p.start()
-            p.join()
+            sock.sendto('thanks', addr)
+        elif message.strip() == 'add':
+            ran = random.randint(1, 100)
+            id = idx[0]
+            state[id].append(ran)
+            print(state)
