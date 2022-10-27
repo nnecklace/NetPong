@@ -1,5 +1,5 @@
 #PONG pygame
-
+import math
 import random
 import pygame, sys
 from game.gamestate import GameState
@@ -24,10 +24,11 @@ PAD_WIDTH = .015
 PAD_HEIGHT = .2
 HALF_PAD_WIDTH = PAD_WIDTH / 2
 HALF_PAD_HEIGHT = PAD_HEIGHT / 2
+paddle0_vel = 0
 paddle1_vel = 0
-paddle2_vel = 0
-paddle1_x = HALF_PAD_WIDTH
-paddle2_x = 1 - HALF_PAD_WIDTH
+paddle0_x = HALF_PAD_WIDTH
+paddle1_x = 1 - HALF_PAD_WIDTH
+BOUNCE_SPEED_UP = 1.1
 
 #surface declaration
 window = pygame.display.set_mode((WIDTH, HEIGHT), RESIZABLE, 32)
@@ -47,10 +48,10 @@ def ball_init(right):
 
 # define event handlers
 def init():
-    global paddle1_vel, paddle2_vel  # these are floats
+    global paddle0_vel, paddle1_vel  # these are floats
     global score1, score2  # these are ints
-    #paddle1_pos = [HALF_PAD_WIDTH - 1,HEIGHT/2]
-    #paddle2_pos = [WIDTH +1 - HALF_PAD_WIDTH,HEIGHT/2]
+    #paddle0_pos = [HALF_PAD_WIDTH - 1,HEIGHT/2]
+    #paddle1_pos = [WIDTH +1 - HALF_PAD_WIDTH,HEIGHT/2]
     game.paddle_positions = [.5,.5]
     game.score = [0,0]
     if random.randrange(0,2) == 0:
@@ -81,6 +82,19 @@ def draw_menu(surface):
     label1 = myfont1.render("START", 1, WHITE)
     surface.blit(label1, (frac_to_px(.42, WIDTH), frac_to_px(.47, HEIGHT)))
 
+def bounce_from_paddle(paddle):
+    game.ball_vel[0] = -game.ball_vel[0]
+    game.ball_vel[0] *= BOUNCE_SPEED_UP
+    game.ball_vel[1] *= BOUNCE_SPEED_UP
+    #get speed
+    speed = mag(game.ball_vel)
+    #calculate new direction vector
+    #get diff from paddle middle
+    diff_frac = (game.ball_pos[1] - game.paddle_positions[paddle]) / HALF_PAD_HEIGHT
+    new_dir = normalize([game.ball_vel[0] / abs(game.ball_vel[0]), diff_frac])
+    #multiply by speed
+    game.ball_vel = [new_dir[0] * speed, new_dir[1] * speed]
+
 #draw function of surface
 def draw_game(surface):
     surface.fill(BLACK)
@@ -91,18 +105,18 @@ def draw_game(surface):
 
     # update paddle's vertical position, keep paddle on the screen
     if game.paddle_positions[0] > HALF_PAD_HEIGHT and game.paddle_positions[0] < 1 - HALF_PAD_HEIGHT:
-        game.paddle_positions[0] += paddle1_vel
-    elif game.paddle_positions[0] <= HALF_PAD_HEIGHT and paddle1_vel > 0:
-        game.paddle_positions[0] += paddle1_vel
-    elif game.paddle_positions[0] >= 1 - HALF_PAD_HEIGHT and paddle1_vel < 0:
-        game.paddle_positions[0] += paddle1_vel
+        game.paddle_positions[0] += paddle0_vel
+    elif game.paddle_positions[0] <= HALF_PAD_HEIGHT and paddle0_vel > 0:
+        game.paddle_positions[0] += paddle0_vel
+    elif game.paddle_positions[0] >= 1 - HALF_PAD_HEIGHT and paddle0_vel < 0:
+        game.paddle_positions[0] += paddle0_vel
     
     if game.paddle_positions[1] > HALF_PAD_HEIGHT and game.paddle_positions[1] < 1 - HALF_PAD_HEIGHT:
-        game.paddle_positions[1] += paddle2_vel
-    elif game.paddle_positions[1] <= HALF_PAD_HEIGHT and paddle2_vel > 0:
-        game.paddle_positions[1] += paddle2_vel
-    elif game.paddle_positions[1] >= 1 - HALF_PAD_HEIGHT and paddle2_vel < 0:
-        game.paddle_positions[1] += paddle2_vel
+        game.paddle_positions[1] += paddle1_vel
+    elif game.paddle_positions[1] <= HALF_PAD_HEIGHT and paddle1_vel > 0:
+        game.paddle_positions[1] += paddle1_vel
+    elif game.paddle_positions[1] >= 1 - HALF_PAD_HEIGHT and paddle1_vel < 0:
+        game.paddle_positions[1] += paddle1_vel
 
     #update ball
     game.ball_pos[0] += game.ball_vel[0]
@@ -138,19 +152,17 @@ def draw_game(surface):
     if game.ball_pos[0] <= BALL_WIDTH/2 + PAD_WIDTH:
         if (game.ball_pos[1] <= game.paddle_positions[0] + HALF_PAD_HEIGHT
             and game.ball_pos[1] >= game.paddle_positions[0] - HALF_PAD_HEIGHT):
-            game.ball_vel[0] = -game.ball_vel[0]
-            game.ball_vel[0] *= 1.1
-            game.ball_vel[1] *= 1.1
-        else:
+            if game.ball_vel[0] < 0:
+                bounce_from_paddle(0)
+        elif game.ball_pos[0] <= BALL_WIDTH/2:
             game.score[1] += 1
             ball_init(True)
     elif game.ball_pos[0] >= 1 - (BALL_WIDTH/2 + PAD_WIDTH):
         if (game.ball_pos[1] <= game.paddle_positions[1] + HALF_PAD_HEIGHT
             and game.ball_pos[1] >= game.paddle_positions[1] - HALF_PAD_HEIGHT):
-            game.ball_vel[0] = -game.ball_vel[0]
-            game.ball_vel[0] *= 1.1
-            game.ball_vel[1] *= 1.1
-        else:
+            if game.ball_vel[0] > 0:
+                bounce_from_paddle(1)
+        elif game.ball_pos[0] >= 1 - BALL_WIDTH/2:
             game.score[0] += 1
             ball_init(False)
 
@@ -166,25 +178,25 @@ def draw_game(surface):
     
 #keydown handler
 def keydown(event):
-    global paddle1_vel, paddle2_vel
+    global paddle0_vel, paddle1_vel
     
     if event.key == K_UP:
-        paddle2_vel = -.02
-    elif event.key == K_DOWN:
-        paddle2_vel = .02
-    elif event.key == K_w:
         paddle1_vel = -.02
-    elif event.key == K_s:
+    elif event.key == K_DOWN:
         paddle1_vel = .02
+    elif event.key == K_w:
+        paddle0_vel = -.02
+    elif event.key == K_s:
+        paddle0_vel = .02
 
 #keyup handler
 def keyup(event):
-    global paddle1_vel, paddle2_vel
+    global paddle0_vel, paddle1_vel
     
     if event.key in (K_w, K_s):
-        paddle1_vel = 0
+        paddle0_vel = 0
     elif event.key in (K_UP, K_DOWN):
-        paddle2_vel = 0
+        paddle1_vel = 0
 
 
 cont = False
