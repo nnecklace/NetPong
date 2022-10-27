@@ -9,6 +9,10 @@ def start(id, state, socket):
     room.start(id, state, socket)
 
 
+def create_message(msg, addr):
+    return {'message': msg, 'addr': addr}
+
+
 if __name__ == '__main__':
     print('Server starting....')
     print('Listening to port 5005')
@@ -31,10 +35,10 @@ if __name__ == '__main__':
             print('start recv')
             id = random.randint(1, 10)
             state[id] = manager.list()
-            state[id].append(addr)
+            state[id].append(create_message('start', addr))
             p = Process(target=start, args=(id, state[id], sock))
             p.start()
         elif message.strip() == 'connect':
             print('connect recv')
             id = packet['id']
-            state[id].append({'message': 'connect', 'addr': addr})
+            state[id].append(create_message('connect', addr))

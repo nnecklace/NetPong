@@ -36,5 +36,6 @@ def run(id, state, socket):
         print(room_state)
         if len(state) > 0:
             next = state.pop()
+            print(next)
             if next['message'] == 'connect':
                 connect(id, state, socket, next['addr'])
