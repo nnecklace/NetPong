@@ -15,6 +15,10 @@ WHITE = (255,255,255)
 BLACK = (0,0,0)
 
 #globals
+END_SCREEN_DURATION = 3000
+WINNING_SCORE = 3
+STATE = 'MENU'
+WINNER = 0
 game = GameState()
 WIDTH = 600
 HEIGHT = 400
@@ -39,8 +43,9 @@ pygame.display.set_caption('NetPong')
 def ball_init(right):
     game.ball_pos = [.5, .5]
     horz = px_to_frac(random.randrange(2,4), 600)
-    vert = px_to_frac(random.randrange(1,3), 400)
-    
+    vert = px_to_frac(random.randrange(0,3), 400)
+    if random.randrange(0,2) == 0:
+        vert = -vert
     if right == False:
         horz = - horz
         
@@ -49,7 +54,6 @@ def ball_init(right):
 # define event handlers
 def init():
     global paddle0_vel, paddle1_vel  # these are floats
-    global score1, score2  # these are ints
     #paddle0_pos = [HALF_PAD_WIDTH - 1,HEIGHT/2]
     #paddle1_pos = [WIDTH +1 - HALF_PAD_WIDTH,HEIGHT/2]
     game.paddle_positions = [.5,.5]
@@ -94,6 +98,33 @@ def bounce_from_paddle(paddle):
     new_dir = normalize([game.ball_vel[0] / abs(game.ball_vel[0]), diff_frac])
     #multiply by speed
     game.ball_vel = [new_dir[0] * speed, new_dir[1] * speed]
+
+def score(p):
+    game.score[p] += 1
+    if game.score[p] >= WINNING_SCORE:
+        end_game(p)
+    else:
+        ball_init(p==1)
+
+def end_game(p):
+    global STATE, win_time
+    print('player ' + str(p+1) + ' has won')
+    STATE = 'GAME_END'
+    WINNER = p+1
+    win_time = pygame.time.get_ticks()
+
+def draw_end(surface):
+    global win_time, STATE
+    surface.fill(BLACK)
+    font_height = .1
+    myfont1 = pygame.font.SysFont("agencyfb", int(frac_to_px(font_height, HEIGHT)), bold=True)
+    label1 = myfont1.render("WINNER", 1, WHITE)
+    surface.blit(label1, (frac_to_px(.42, WIDTH), frac_to_px(.43, HEIGHT)))
+    label2 = myfont1.render("P1", 1, WHITE)
+    surface.blit(label2, (frac_to_px(.49, WIDTH), frac_to_px(.5, HEIGHT)))
+    if (pygame.time.get_ticks() >= win_time + END_SCREEN_DURATION):
+        STATE = 'MENU'
+
 
 #draw function of surface
 def draw_game(surface):
@@ -155,16 +186,14 @@ def draw_game(surface):
             if game.ball_vel[0] < 0:
                 bounce_from_paddle(0)
         elif game.ball_pos[0] <= BALL_WIDTH/2:
-            game.score[1] += 1
-            ball_init(True)
+            score(1)
     elif game.ball_pos[0] >= 1 - (BALL_WIDTH/2 + PAD_WIDTH):
         if (game.ball_pos[1] <= game.paddle_positions[1] + HALF_PAD_HEIGHT
             and game.ball_pos[1] >= game.paddle_positions[1] - HALF_PAD_HEIGHT):
             if game.ball_vel[0] > 0:
                 bounce_from_paddle(1)
         elif game.ball_pos[0] >= 1 - BALL_WIDTH/2:
-            game.score[0] += 1
-            ball_init(False)
+            score(0)
 
     #update scores
     myfont1 = pygame.font.SysFont("agencyfb", 20)
@@ -178,57 +207,44 @@ def draw_game(surface):
     
 #keydown handler
 def keydown(event):
+    global STATE
     global paddle0_vel, paddle1_vel
+    if (STATE == 'MENU'):
+        if event.key == K_RETURN or event.key == K_SPACE:
+            STATE = 'PLAYING'
+            init()
+    elif (STATE == 'PLAYING'):
+        if event.key == K_UP:
+            paddle1_vel = -.02
+        elif event.key == K_DOWN:
+            paddle1_vel = .02
+        elif event.key == K_w:
+            paddle0_vel = -.02
+        elif event.key == K_s:
+            paddle0_vel = .02
     
-    if event.key == K_UP:
-        paddle1_vel = -.02
-    elif event.key == K_DOWN:
-        paddle1_vel = .02
-    elif event.key == K_w:
-        paddle0_vel = -.02
-    elif event.key == K_s:
-        paddle0_vel = .02
 
 #keyup handler
 def keyup(event):
     global paddle0_vel, paddle1_vel
-    
-    if event.key in (K_w, K_s):
-        paddle0_vel = 0
-    elif event.key in (K_UP, K_DOWN):
-        paddle1_vel = 0
+    if (STATE == 'MENU'):
+        pass
+    elif (STATE == 'PLAYING'):
+        if event.key in (K_w, K_s):
+            paddle0_vel = 0
+        elif event.key in (K_UP, K_DOWN):
+            paddle1_vel = 0
 
 
-cont = False
-while not cont:
-
-    draw_menu(window)
-
-    for event in pygame.event.get():
-        if event.type == KEYDOWN and (event.key == K_RETURN or event.key == K_SPACE):
-            cont = True
-        elif event.type == QUIT:
-            pygame.quit()
-            sys.exit()
-        elif event.type == VIDEORESIZE:
-            if (window.get_width() / window.get_height() >= 3 / 2):
-                HEIGHT = window.get_height()
-                WIDTH = int(window.get_height() * 3 / 2)
-            else:
-                WIDTH = window.get_width()
-                HEIGHT = int(window.get_width() * 2 / 3)
-            
-    pygame.display.update()
-    clock.tick(30)
-
-init()
-
-#game loop
 while True:
-    draw_game(window)
+    if (STATE == 'MENU'):
+        draw_menu(window)
+    elif (STATE == 'PLAYING'):
+        draw_game(window)
+    elif (STATE == 'GAME_END'):
+        draw_end(window)
 
     for event in pygame.event.get():
-
         if event.type == KEYDOWN:
             keydown(event)
         elif event.type == KEYUP:
@@ -243,6 +259,7 @@ while True:
             else:
                 WIDTH = window.get_width()
                 HEIGHT = int(window.get_width() * 2 / 3)
-        
+            
     pygame.display.update()
     clock.tick(60)
+
