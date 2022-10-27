@@ -1,67 +1,37 @@
 #PONG pygame
 import math
-import random
 import pygame, sys
-from game.gamestate import GameState
+from services.game.gamestate import GameState
 from pygame.locals import *
 from helpers.convert import *
+from helpers.config import *
+from services.network import Session
+from services.mock_service import MockGame
 
 
 pygame.init()
 clock = pygame.time.Clock()
 
-#colors
+mock = None
+if len(sys.argv) > 1 and sys.argv[1] == '-d':
+    mock = MockGame()
+
+session = Session(mock)
+#globals
 WHITE = (255,255,255)
 BLACK = (0,0,0)
-
-#globals
 END_SCREEN_DURATION = 3000
-WINNING_SCORE = 3
 STATE = 'MENU'
-WINNER = 0
 game = GameState()
 WIDTH = 600
 HEIGHT = 400
-BALL_WIDTH = .025
-BALL_HEIGHT = BALL_WIDTH * 3 / 2
-PAD_WIDTH = .015
-PAD_HEIGHT = .2
-HALF_PAD_WIDTH = PAD_WIDTH / 2
-HALF_PAD_HEIGHT = PAD_HEIGHT / 2
 paddle0_vel = 0
 paddle1_vel = 0
-paddle0_x = HALF_PAD_WIDTH
-paddle1_x = 1 - HALF_PAD_WIDTH
-BOUNCE_SPEED_UP = 1.1
+
 
 #surface declaration
 window = pygame.display.set_mode((WIDTH, HEIGHT), RESIZABLE, 32)
 pygame.display.set_caption('NetPong')
-
-# helper function that spawns a ball, returns a position vector and a velocity vector
-# if right is True, spawn to the right, else spawn to the left
-def ball_init(right):
-    game.ball_pos = [.5, .5]
-    horz = px_to_frac(random.randrange(2,4), 600)
-    vert = px_to_frac(random.randrange(0,3), 400)
-    if random.randrange(0,2) == 0:
-        vert = -vert
-    if right == False:
-        horz = - horz
-        
-    game.ball_vel = [horz,-vert]
-
-# define event handlers
-def init():
-    global paddle0_vel, paddle1_vel  # these are floats
-    #paddle0_pos = [HALF_PAD_WIDTH - 1,HEIGHT/2]
-    #paddle1_pos = [WIDTH +1 - HALF_PAD_WIDTH,HEIGHT/2]
-    game.paddle_positions = [.5,.5]
-    game.score = [0,0]
-    if random.randrange(0,2) == 0:
-        ball_init(True)
-    else:
-        ball_init(False)
 
 
 def draw_menu(surface):
@@ -86,26 +56,6 @@ def draw_menu(surface):
     label1 = myfont1.render("START", 1, WHITE)
     surface.blit(label1, (frac_to_px(.42, WIDTH), frac_to_px(.47, HEIGHT)))
 
-def bounce_from_paddle(paddle):
-    game.ball_vel[0] = -game.ball_vel[0]
-    game.ball_vel[0] *= BOUNCE_SPEED_UP
-    game.ball_vel[1] *= BOUNCE_SPEED_UP
-    #get speed
-    speed = mag(game.ball_vel)
-    #calculate new direction vector
-    #get diff from paddle middle
-    diff_frac = (game.ball_pos[1] - game.paddle_positions[paddle]) / HALF_PAD_HEIGHT
-    new_dir = normalize([game.ball_vel[0] / abs(game.ball_vel[0]), diff_frac])
-    #multiply by speed
-    game.ball_vel = [new_dir[0] * speed, new_dir[1] * speed]
-
-def score(p):
-    game.score[p] += 1
-    if game.score[p] >= WINNING_SCORE:
-        end_game(p)
-    else:
-        ball_init(p==1)
-
 def end_game(p):
     global STATE, win_time
     print('player ' + str(p+1) + ' has won')
@@ -125,33 +75,48 @@ def draw_end(surface):
     if (pygame.time.get_ticks() >= win_time + END_SCREEN_DURATION):
         STATE = 'MENU'
 
+def update_state():
+    global game, session
+    net_state = session.get_state()
+    game.paddle_positions = net_state.paddle_positions
+    game.score = net_state.score
+    game.ball_pos = net_state.ball_pos
+    game.status = net_state.status
+    game.winner = net_state.winner
+    if game.status == 'ended':
+        end_game(game.winner)
 
 #draw function of surface
 def draw_game(surface):
+    # playing field, static
     surface.fill(BLACK)
     pygame.draw.line(surface, WHITE, [WIDTH / 2, 0],[WIDTH / 2, HEIGHT], 1)
     pygame.draw.line(surface, WHITE, [PAD_WIDTH, 0],[PAD_WIDTH, HEIGHT], 1)
     pygame.draw.line(surface, WHITE, [WIDTH - PAD_WIDTH, 0],[WIDTH - PAD_WIDTH, HEIGHT], 1)
+    pygame.draw.line(surface, WHITE, [0, 1], [WIDTH, 1], 1)
+    pygame.draw.line(surface, WHITE, [0, HEIGHT-1], [WIDTH, HEIGHT-1], 1)
     pygame.draw.circle(surface, WHITE, [WIDTH//2, HEIGHT//2], 70, 1)
 
     # update paddle's vertical position, keep paddle on the screen
     if game.paddle_positions[0] > HALF_PAD_HEIGHT and game.paddle_positions[0] < 1 - HALF_PAD_HEIGHT:
-        game.paddle_positions[0] += paddle0_vel
+        game.paddle_positions[0] += paddle0_vel * deltatime / 1000
     elif game.paddle_positions[0] <= HALF_PAD_HEIGHT and paddle0_vel > 0:
-        game.paddle_positions[0] += paddle0_vel
+        game.paddle_positions[0] += paddle0_vel * deltatime / 1000
     elif game.paddle_positions[0] >= 1 - HALF_PAD_HEIGHT and paddle0_vel < 0:
-        game.paddle_positions[0] += paddle0_vel
+        game.paddle_positions[0] += paddle0_vel * deltatime / 1000
     
+    #network functions
+    session.send(game.paddle_positions[0])
+    update_state()
+    #Opponent's paddle, should be updated on the server
+    """
     if game.paddle_positions[1] > HALF_PAD_HEIGHT and game.paddle_positions[1] < 1 - HALF_PAD_HEIGHT:
         game.paddle_positions[1] += paddle1_vel
     elif game.paddle_positions[1] <= HALF_PAD_HEIGHT and paddle1_vel > 0:
         game.paddle_positions[1] += paddle1_vel
     elif game.paddle_positions[1] >= 1 - HALF_PAD_HEIGHT and paddle1_vel < 0:
         game.paddle_positions[1] += paddle1_vel
-
-    #update ball
-    game.ball_pos[0] += game.ball_vel[0]
-    game.ball_pos[1] += game.ball_vel[1]
+    """
 
     #draw paddles and ball
     pygame.draw.rect(surface, WHITE, (
@@ -172,29 +137,7 @@ def draw_game(surface):
             [frac_to_px(1, WIDTH), frac_to_px(game.paddle_positions[1] + HALF_PAD_HEIGHT, HEIGHT)],
             [frac_to_px(1, WIDTH), frac_to_px(game.paddle_positions[1] - HALF_PAD_HEIGHT, HEIGHT)]
         ],0)
-
-    #ball collision check on top and bottom walls
-    if game.ball_pos[1] <= BALL_HEIGHT/2:
-        game.ball_vel[1] = - game.ball_vel[1]
-    if game.ball_pos[1] >= 1 - BALL_HEIGHT/2:
-        game.ball_vel[1] = - game.ball_vel[1]
     
-    #ball collison check on gutters or paddles
-    if game.ball_pos[0] <= BALL_WIDTH/2 + PAD_WIDTH:
-        if (game.ball_pos[1] <= game.paddle_positions[0] + HALF_PAD_HEIGHT
-            and game.ball_pos[1] >= game.paddle_positions[0] - HALF_PAD_HEIGHT):
-            if game.ball_vel[0] < 0:
-                bounce_from_paddle(0)
-        elif game.ball_pos[0] <= BALL_WIDTH/2:
-            score(1)
-    elif game.ball_pos[0] >= 1 - (BALL_WIDTH/2 + PAD_WIDTH):
-        if (game.ball_pos[1] <= game.paddle_positions[1] + HALF_PAD_HEIGHT
-            and game.ball_pos[1] >= game.paddle_positions[1] - HALF_PAD_HEIGHT):
-            if game.ball_vel[0] > 0:
-                bounce_from_paddle(1)
-        elif game.ball_pos[0] >= 1 - BALL_WIDTH/2:
-            score(0)
-
     #update scores
     myfont1 = pygame.font.SysFont("agencyfb", 20)
     label1 = myfont1.render("Score "+str(game.score[0]), 1, WHITE)
@@ -212,16 +155,13 @@ def keydown(event):
     if (STATE == 'MENU'):
         if event.key == K_RETURN or event.key == K_SPACE:
             STATE = 'PLAYING'
-            init()
+            if mock:
+                mock.init()
     elif (STATE == 'PLAYING'):
-        if event.key == K_UP:
-            paddle1_vel = -.02
-        elif event.key == K_DOWN:
-            paddle1_vel = .02
-        elif event.key == K_w:
-            paddle0_vel = -.02
+        if event.key == K_w:
+            paddle0_vel = -PADDLE_VEL
         elif event.key == K_s:
-            paddle0_vel = .02
+            paddle0_vel = PADDLE_VEL
     
 
 #keyup handler
@@ -251,6 +191,7 @@ while True:
             keyup(event)
         elif event.type == QUIT:
             pygame.quit()
+            session.quit()
             sys.exit()
         elif event.type == VIDEORESIZE:
             if (window.get_width() / window.get_height() >= 3 / 2):
@@ -261,5 +202,6 @@ while True:
                 HEIGHT = int(window.get_width() * 2 / 3)
             
     pygame.display.update()
-    clock.tick(60)
+    deltatime = clock.tick(60)
+    mock.update(deltatime)
 
