@@ -18,7 +18,7 @@ def start(id, state, socket):
     print(addr)
     res = json.dumps(room_state)
     socket.sendto(str.encode(res), addr)
-    run(state)
+    run(id, state, socket)
 
 
 def connect(id, state, socket, addr):
