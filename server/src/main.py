@@ -37,4 +37,4 @@ if __name__ == '__main__':
         elif message.strip() == 'connect':
             print('connect recv')
             id = packet['id']
-            state[id].append({message: 'connect', addr: addr})
+            state[id].append({'message': 'connect', 'addr': addr})

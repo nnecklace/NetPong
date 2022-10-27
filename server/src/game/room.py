@@ -21,14 +21,20 @@ def start(id, state, socket):
     run(state)
 
 
-def connect(id, state, socket):
+def connect(id, state, socket, addr):
     if room_state["state"] != 'playing':
-        room_state["player_2_pos"]: 0.5
-        room_state["player_2_id"]: random.getrandbits(32)
-        room_state['playing']
+        room_state["player_2_pos"] = 0.5
+        room_state["player_2_id"] = random.getrandbits(32)
+        room_state['state'] = 'playing'
+        res = json.dumps(room_state)
+        socket.sendto(str.encode(res), addr)
 
 
-def run(state):
+def run(id, state, socket):
     while True:
         time.sleep(5)
-        print(state)
+        print(room_state)
+        if len(state) > 0:
+            next = state.pop()
+            if next['message'] == 'connect':
+                connect(id, state, socket, next['addr'])
