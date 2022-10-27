@@ -1,5 +1,7 @@
 import time
 import random
+import socket
+import json
 
 room_state = {
     "player_1_id": random.getrandbits(32),
@@ -9,10 +11,15 @@ room_state = {
     "score": (0, 0)
 }
 
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
 
 def start(id, state):
     print(f'starting game room %s' % id)
     room_state["room_id"] = id
+    addr = state[0]
+    res = json.dumps(room_state)
+    sock.sendto(str.encode(res), addr)
     run(state)
 
 
@@ -24,7 +31,6 @@ def connect():
 
 
 def run(state):
-    print('asd')
     while True:
         time.sleep(5)
         print(state)
