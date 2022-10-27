@@ -21,7 +21,7 @@ def start(id, state, socket):
     run(state)
 
 
-def connect():
+def connect(id, state, socket):
     if room_state["state"] != 'playing':
         room_state["player_2_pos"]: 0.5
         room_state["player_2_id"]: random.getrandbits(32)
@@ -32,9 +32,3 @@ def run(state):
     while True:
         time.sleep(5)
         print(state)
-        if len(state) > 0:
-            n = state.pop()
-            if n:
-                print(f'state is %s' % n)
-                print(state)
-                # break

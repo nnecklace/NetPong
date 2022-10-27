@@ -4,8 +4,6 @@ from game import room
 import random
 import json
 
-idx = []
-
 
 def start(id, state, socket):
     room.start(id, state, socket)
@@ -32,13 +30,11 @@ if __name__ == '__main__':
         if message.strip() == 'start':
             print('start recv')
             id = random.randint(1, 10)
-            idx.append(id)
             state[id] = manager.list()
             state[id].append(addr)
             p = Process(target=start, args=(id, state[id], sock))
             p.start()
-        elif message.strip() == 'add':
-            ran = random.randint(1, 100)
-            id = idx[0]
-            state[id].append(ran)
-            print(state)
+        elif message.strip() == 'connect':
+            print('connect recv')
+            id = packet['id']
+            state[id].append({message: 'connect', addr: addr})
