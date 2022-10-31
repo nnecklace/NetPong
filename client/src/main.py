@@ -83,6 +83,11 @@ def draw_menu(surface):
   draw_button(surface, -1, 'HOST', CHOSEN_BUTTON == 0)
   draw_button(surface, 0, 'JOIN', CHOSEN_BUTTON == 1)
   draw_button(surface, 1, 'EXIT', CHOSEN_BUTTON == 2)
+  # TITLE
+  font_height = .2
+  myfont1 = pygame.font.SysFont("agencyfb", int(frac_to_px(font_height, HEIGHT)), bold=True)
+  label1 = myfont1.render('NETPONG', 1, WHITE)
+  surface.blit(label1, (frac_to_px(.24, WIDTH), frac_to_px(.05, HEIGHT)))
 
 def end_game(p):
   global STATE, win_time
