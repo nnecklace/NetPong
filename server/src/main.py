@@ -42,3 +42,7 @@ if __name__ == '__main__':
             print('connect recv')
             id = packet['id']
             state[id].append(create_message('connect', addr))
+        elif message.strip() == 'update':
+            print('update recv')
+            id = packet['id']
+            state[id].append(create_message('update', addr))
