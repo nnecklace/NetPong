@@ -9,8 +9,8 @@ def start(id, state, socket):
     room.start(id, state, socket)
 
 
-def create_message(msg, addr):
-    return {'message': msg, 'addr': addr}
+def create_message(msg, addr, timestamp):
+    return {'message': msg, 'addr': addr, 'timestamp': timestamp}
 
 
 if __name__ == '__main__':
@@ -31,18 +31,19 @@ if __name__ == '__main__':
         print("message %s" % packet)
         packet = json.loads(packet)
         message = packet['message']
+        timestamp = packet['timestamp']
         if message.strip() == 'start':
             print('start recv')
             id = random.randint(1, 10)
             state[id] = manager.list()
-            state[id].append(create_message('start', addr))
+            state[id].append(create_message('start', addr, timestamp))
             p = Process(target=start, args=(id, state[id], sock))
             p.start()
         elif message.strip() == 'connect':
             print('connect recv')
             id = packet['id']
-            state[id].append(create_message('connect', addr))
+            state[id].append(create_message('connect', addr, timestamp))
         elif message.strip() == 'update':
             print('update recv')
             id = packet['id']
-            state[id].append(create_message('update', addr))
+            state[id].append(create_message('update', addr, timestamp))

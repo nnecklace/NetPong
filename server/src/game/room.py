@@ -53,7 +53,7 @@ def answer(socket, addr):
 
 
 def connect(id, state, socket, addr):
-    if room_state["state"] != 'playing':
+    if room_state["state"] != 'running':
         room_state["player_2_pos"] = 0.5
         room_state["player_2_id"] = random.getrandbits(32)
         init()
