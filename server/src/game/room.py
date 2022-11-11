@@ -158,7 +158,7 @@ def run(id, state, socket):
         print(f'game room {id} with state {room_state}')
         if room_state['state'] == 'running':
             answer(room_state['player_1_socket'], room_state['player_1_addr'])
-            answer(room_state['playet_2_socket'], room_state['player_2_addr'])
+            answer(room_state['player_2_socket'], room_state['player_2_addr'])
         if len(state) > 0:
             next = state.pop()
             addr = next['addr']
