@@ -52,7 +52,9 @@ def start(id, state, socket):
 
 
 def answer(socket, addr):
-    res = json.dumps(room_state)
+    response = {k: i for k, i in room_state.items(
+    ) if k != "player_1_socket" or k != "player_2_socket"}
+    res = json.dumps(response)
     socket.sendto(str.encode(res), addr)
 
 
