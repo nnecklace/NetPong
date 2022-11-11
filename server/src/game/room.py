@@ -94,7 +94,7 @@ def update(id, state, socket, addr, delta_time):
 
 def ball_init(right):
     game = room_state
-    game['ball_pos'] = (0.5, 0.5)
+    game['ball_pos'] = [0.5, 0.5]
     #horz = px_to_frac(random.randrange(2,4), 600)
     horz = random.uniform(BALL_HORZ_RANGE[0], BALL_HORZ_RANGE[1])
     #vert = px_to_frac(random.randrange(0,3), 400)
