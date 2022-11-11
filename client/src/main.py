@@ -1,6 +1,7 @@
 #PONG pygame
 import math
 import pygame, sys
+import threading
 from services.game.gamestate import GameState
 from pygame.locals import *
 from helpers.convert import *
@@ -17,6 +18,7 @@ if len(sys.argv) > 1 and sys.argv[1] == '-d':
     mock = MockGame()
 
 session = Session(mock)
+thread = None
 #globals
 CHOSEN_BUTTON = 0
 WHITE = (255,255,255)
@@ -36,11 +38,22 @@ pygame.display.set_caption('NetPong')
 
 def press_button():
   global CHOSEN_BUTTON, STATE
-  if CHOSEN_BUTTON == 0 or CHOSEN_BUTTON == 1:
-    STATE = 'PLAYING'
-    if mock:
+  if CHOSEN_BUTTON == 0:
+    STATE = "PLAYING"
+    if mock != None:
       mock.init()
-  if CHOSEN_BUTTON == 2:
+    thread = threading.Thread(target=session.init_connection, args=('start',))
+    thread.start()
+  elif CHOSEN_BUTTON == 1:
+    STATE = 'PLAYING'
+    if mock != None:
+      print('initiating in debug mode')
+      mock.init()
+    else:
+      print('going live ')
+      thread = threading.Thread(target=session.init_connection, args=('join',))
+      thread.start()
+  elif CHOSEN_BUTTON == 2:
     pygame.quit()
     session.quit()
     sys.exit()
@@ -238,5 +251,6 @@ while True:
             
     pygame.display.update()
     deltatime = clock.tick(60)
-    mock.update(deltatime)
+    if (mock):
+      mock.update(deltatime)
 
