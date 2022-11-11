@@ -26,7 +26,9 @@ room_state = {
     "last_updated": 0,
     "player_1_addr": None,
     "player_2_addr": None,
-    "winner": 0
+    "winner": 0,
+    "player_1_socket": None,
+    "player_2_socket": None
 }
 
 
@@ -44,6 +46,7 @@ def start(id, state, socket):
     print(f'starting game room %s' % id)
     room_state["room_id"] = id
     room_state["player_1_addr"] = packet['addr']
+    room_state["player_1_socket"] = socket
     answer(socket, packet['addr'])
     run(id, state, socket)
 
@@ -58,6 +61,7 @@ def connect(id, state, socket, addr):
         room_state["player_2_pos"] = 0.5
         room_state["player_2_id"] = random.getrandbits(32)
         room_state["player_2_addr"] = addr
+        room_state["player_2_socket"] = socket
         init()
         answer(socket, addr)
 
@@ -151,8 +155,8 @@ def run(id, state, socket):
         time.sleep(5)
         print(f'game room {id} with state {room_state}')
         if room_state['state'] == 'running':
-            answer(socket, room_state['player_1_addr'])
-            answer(socket, room_state['player_2_addr'])
+            answer(room_state['player_1_socket'], room_state['player_1_addr'])
+            answer(room_state['playet_2_socket'], room_state['player_2_addr'])
         if len(state) > 0:
             next = state.pop()
             addr = next['addr']
