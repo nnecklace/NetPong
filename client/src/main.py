@@ -1,7 +1,6 @@
 #PONG pygame
 import math
 import pygame, sys
-import threading
 from services.game.gamestate import GameState
 from pygame.locals import *
 from helpers.convert import *
@@ -18,7 +17,6 @@ if len(sys.argv) > 1 and sys.argv[1] == '-d':
     mock = MockGame()
 
 session = Session(mock)
-thread = None
 #globals
 CHOSEN_BUTTON = 0
 WHITE = (255,255,255)
@@ -37,22 +35,19 @@ window = pygame.display.set_mode((WIDTH, HEIGHT), RESIZABLE, 32)
 pygame.display.set_caption('NetPong')
 
 def press_button():
-  global CHOSEN_BUTTON, STATE
+  global CHOSEN_BUTTON, STATE, session
   if CHOSEN_BUTTON == 0:
     STATE = "PLAYING"
     if mock != None:
       mock.init()
-    thread = threading.Thread(target=session.init_connection, args=('start',))
-    thread.start()
+    else:
+      session.init_connection('start')
   elif CHOSEN_BUTTON == 1:
     STATE = 'PLAYING'
     if mock != None:
-      print('initiating in debug mode')
       mock.init()
     else:
-      print('going live ')
-      thread = threading.Thread(target=session.init_connection, args=('join',))
-      thread.start()
+      session.init_connection('join')
   elif CHOSEN_BUTTON == 2:
     pygame.quit()
     session.quit()
@@ -127,9 +122,9 @@ def update_state():
   game.paddle_positions = net_state.paddle_positions
   game.score = net_state.score
   game.ball_pos = net_state.ball_pos
-  game.status = net_state.status
+  game.state = net_state.state
   game.winner = net_state.winner
-  if game.status == 'ended':
+  if game.state == 'ended':
     end_game(game.winner)
 
 #draw function of surface

@@ -1,5 +1,5 @@
 class GameState:
-  status = 'running'
+  state = 'running'
   winner = 0
   paddle_positions = [.5,.5]
   score = [0,0]
