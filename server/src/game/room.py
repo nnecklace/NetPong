@@ -177,24 +177,25 @@ def run(room_id, state, socket):
         if len(state) > 0:
             next = state.pop()
             addr = next['addr']
-            if next['timestamp'] > room_state['player_1_last_update'] and next['player_id'] == room_state['player_1_id']:
-                data = next['data']
-                room_state['player_1_last_update'] = current_time
-                print('message:', next['message'])
-                if next['message'] == 'update':
-                    #print('updating paddle_position based on ', data)
-                    update_paddle(data['player_id'], data['paddle_pos'])
-            
-            if next['timestamp'] > room_state['player_2_last_update'] and next['player_id'] == room_state['player_2_id']:
-                data = next['data']
-                room_state['player_2_last_update'] = current_time
-                print('message:', next['message'])
+            if next['message'] != 'start':
+                if next['timestamp'] > room_state['player_1_last_update'] and next['player_id'] == room_state['player_1_id']:
+                    data = next['data']
+                    room_state['player_1_last_update'] = current_time
+                    print('message:', next['message'])
+                    if next['message'] == 'update':
+                        #print('updating paddle_position based on ', data)
+                        update_paddle(data['player_id'], data['paddle_pos'])
+                
+                if next['timestamp'] > room_state['player_2_last_update'] and next['player_id'] == room_state['player_2_id']:
+                    data = next['data']
+                    room_state['player_2_last_update'] = current_time
+                    print('message:', next['message'])
 
-                if next['message'] == 'connect':
-                    connect(room_id, state, socket, addr)
-                elif next['message'] == 'update':
-                    #print('updating paddle_position based on ', data)
-                    update_paddle(data['player_id'], data['paddle_pos'])
+                    if next['message'] == 'connect':
+                        connect(room_id, state, socket, addr)
+                    elif next['message'] == 'update':
+                        #print('updating paddle_position based on ', data)
+                        update_paddle(data['player_id'], data['paddle_pos'])
         
         #except Exception:
         #    print('fuck')
@@ -209,8 +210,8 @@ def run(room_id, state, socket):
             if room_state['state'] == 'running':
                 answer(room_state['player_1_socket'],
                     room_state['player_1_addr'])
-                #answer(room_state['player_2_socket'],
-                #       room_state['player_2_addr'])
+                answer(room_state['player_2_socket'],
+                       room_state['player_2_addr'])
             prev_tick = current_time
 
     print('killing room', room_state['room_id'])
