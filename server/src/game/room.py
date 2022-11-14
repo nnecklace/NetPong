@@ -50,8 +50,8 @@ def start(room_id, state, socket):
     room_state["player_1_addr"] = packet['addr']
     room_state["player_1_socket"] = socket
     answer(socket, packet['addr'])
-    run(room_id, state, socket)
     init()
+    run(room_id, state, socket)
 
 
 def answer(socket, addr):
