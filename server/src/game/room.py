@@ -15,7 +15,7 @@ PADDLE_VEL = 1.2
 BALL_HORZ_RANGE = (0.2, 0.4)
 BALL_VERT_RANGE = (0, 0.3)
 KILL_TIMEOUT = 10 # in seconds
-TICKS_PER_SECOND = 4 # for production a value of 60 should be okay
+TICKS_PER_SECOND = 60 # for production a value of 60 should be okay
 TICK_RATE = 1/TICKS_PER_SECOND
 BALL_SPEED_MULTIPLIER = 0.5
 
@@ -59,7 +59,7 @@ def answer(socket, addr):
     response = {k: i for k, i in room_state.items(
     ) if k != "player_1_socket" and k != "player_2_socket" and "player_1_addr" and "player_2_addr"}
     res = json.dumps(response)
-    print('res:',res)
+    #print('res:',res)
     socket.sendto(str.encode(res), addr)
 
 
