@@ -21,6 +21,7 @@ BALL_SPEED_MULTIPLIER = 0.5
 
 room_state = {
     "player_1_id": random.getrandbits(32),
+    "player_2_id": None,
     "ball_pos": [0.5, 0.5],
     "ball_velocity": [0, 0],
     "paddle_positions": [0.5, 0.5],
@@ -186,7 +187,7 @@ def run(room_id, state, socket):
                     print('message:', next['message'])
                     update_paddle(data['player_id'], data['paddle_pos'])
                 
-                if next['timestamp'] > room_state['player_2_last_update'] and next['data']['player_id'] == room_state['player_2_id']:
+                elif next['timestamp'] > room_state['player_2_last_update'] and next['data']['player_id'] == room_state['player_2_id']:
                     data = next['data']
                     room_state['player_2_last_update'] = current_time
                     update_paddle(data['player_id'], data['paddle_pos'])
