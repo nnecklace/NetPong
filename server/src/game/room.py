@@ -177,25 +177,19 @@ def run(room_id, state, socket):
         if len(state) > 0:
             next = state.pop()
             addr = next['addr']
-            if next['message'] != 'start':
-                if next['timestamp'] > room_state['player_1_last_update'] and next['player_id'] == room_state['player_1_id']:
+            if next['message'] == 'connect':
+                connect(room_id, state, socket, addr)
+            elif next['message'] == 'update':
+                if next['timestamp'] > room_state['player_1_last_update'] and next['data']['player_id'] == room_state['player_1_id']:
                     data = next['data']
                     room_state['player_1_last_update'] = current_time
                     print('message:', next['message'])
-                    if next['message'] == 'update':
-                        #print('updating paddle_position based on ', data)
-                        update_paddle(data['player_id'], data['paddle_pos'])
+                    update_paddle(data['player_id'], data['paddle_pos'])
                 
-                if next['timestamp'] > room_state['player_2_last_update'] and next['player_id'] == room_state['player_2_id']:
+                if next['timestamp'] > room_state['player_2_last_update'] and next['data']['player_id'] == room_state['player_2_id']:
                     data = next['data']
                     room_state['player_2_last_update'] = current_time
-                    print('message:', next['message'])
-
-                    if next['message'] == 'connect':
-                        connect(room_id, state, socket, addr)
-                    elif next['message'] == 'update':
-                        #print('updating paddle_position based on ', data)
-                        update_paddle(data['player_id'], data['paddle_pos'])
+                    update_paddle(data['player_id'], data['paddle_pos'])
         
         #except Exception:
         #    print('fuck')
