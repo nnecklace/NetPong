@@ -67,14 +67,13 @@ class Session:
   def get_state(self):
     if self.mock == None:
       game = GameState()
-      print(self.state)
+      #print(self.state)
       if self.state != None:
         game.paddle_positions = self.state['paddle_positions']
         game.ball_pos = self.state['ball_pos']
         game.score = self.state['score']
         game.winner = self.state['winner']
         game.room_id = self.state['room_id']
-        print(game.room_id, self.state['room_id'])
       return game
     return self.mock.game
 

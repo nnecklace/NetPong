@@ -15,7 +15,7 @@ PADDLE_VEL = 1.2
 BALL_HORZ_RANGE = (0.2, 0.4)
 BALL_VERT_RANGE = (0, 0.3)
 KILL_TIMEOUT = 10 # in seconds
-TICKS_PER_SECOND = 60 # for production a value of 60 should be okay
+TICKS_PER_SECOND = .2# for production a value of 60 should be okay
 TICK_RATE = 1/TICKS_PER_SECOND
 BALL_SPEED_MULTIPLIER = 0.5
 
@@ -178,6 +178,7 @@ def run(room_id, state, socket):
             if next['timestamp'] > room_state['last_updated']:
                 data = next['data']
                 room_state['last_updated'] = current_time
+                print('message:', message)
                 if next['message'] == 'connect':
                     print('connecting very much')
                     connect(room_id, state, socket, addr)
