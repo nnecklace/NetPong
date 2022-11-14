@@ -5,12 +5,12 @@ import random
 import json
 
 
-def start(id, state, socket):
-    room.start(id, state, socket)
+def start(room_id, state, socket):
+    room.start(room_id, state, socket)
 
 
-def create_message(msg, addr, timestamp):
-    return {'message': msg, 'addr': addr, 'timestamp': timestamp}
+def create_message(msg, addr, timestamp, data={}):
+    return {'message': msg, 'addr': addr, 'timestamp': timestamp, 'data': data}
 
 
 if __name__ == '__main__':
@@ -34,16 +34,16 @@ if __name__ == '__main__':
         timestamp = packet['timestamp']
         if message.strip() == 'start':
             print('start recv')
-            id = random.randint(1, 10)
-            state[id] = manager.list()
-            state[id].append(create_message('start', addr, timestamp))
-            p = Process(target=start, args=(id, state[id], sock))
+            room_id = random.randint(1, 10)
+            state[room_id] = manager.list()
+            state[room_id].append(create_message('start', addr, timestamp))
+            p = Process(target=start, args=(room_id, state[room_id], sock))
             p.start()
         elif message.strip() == 'connect':
             print('connect recv')
-            id = packet['id']
-            state[id].append(create_message('connect', addr, timestamp))
+            room_id = packet['data']['room_id']
+            state[room_id].append(create_message('connect', addr, timestamp, data))
         elif message.strip() == 'update':
             #print('update recv')
-            id = packet['id']
-            state[id].append(create_message('update', addr, timestamp))
+            room_id = packet['data']['room_id']
+            state[room_id].append(create_message('update', addr, timestamp, data))
