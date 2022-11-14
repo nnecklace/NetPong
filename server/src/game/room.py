@@ -26,12 +26,13 @@ room_state = {
     "paddle_positions": [0.5, 0.5],
     "state": 'waiting',
     "score": [0, 0],
-    "last_updated": 0,
     "player_1_addr": None,
     "player_2_addr": None,
     "winner": 0,
     "player_1_socket": None,
-    "player_2_socket": None
+    "player_2_socket": None,
+    "player_1_last_update": 0,
+    "player_2_last_update": 0
 }
 
 
@@ -63,6 +64,7 @@ def answer(socket, addr):
 
 
 def connect(room_id, state, socket, addr):
+    print('connecting')
     if room_state["state"] != 'running':
         room_state["player_2_pos"] = 0.5
         room_state["player_2_id"] = random.getrandbits(32)
@@ -175,16 +177,24 @@ def run(room_id, state, socket):
         if len(state) > 0:
             next = state.pop()
             addr = next['addr']
-            if next['timestamp'] > room_state['last_updated']:
+            if next['timestamp'] > room_state['player_1_last_update'] and next['player_id'] == room_state['player_1_id']:
                 data = next['data']
-                room_state['last_updated'] = current_time
+                room_state['player_1_last_update'] = current_time
                 print('message:', next['message'])
+                if next['message'] == 'update':
+                    #print('updating paddle_position based on ', data)
+                    update_paddle(data['player_id'], data['paddle_pos'])
+            
+            if next['timestamp'] > room_state['player_2_last_update'] and next['player_id'] == room_state['player_2_id']:
+                data = next['data']
+                room_state['player_2_last_update'] = current_time
+                print('message:', next['message'])
+
                 if next['message'] == 'connect':
-                    print('connecting very much')
                     connect(room_id, state, socket, addr)
                 elif next['message'] == 'update':
                     #print('updating paddle_position based on ', data)
-                    update_paddle(data['player_id'],data['paddle_pos'])
+                    update_paddle(data['player_id'], data['paddle_pos'])
         
         #except Exception:
         #    print('fuck')
