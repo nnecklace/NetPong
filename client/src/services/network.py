@@ -38,6 +38,10 @@ class Session:
   # player paddle position and metadata
   def send(self, paddle_pos):
     # update game state based on received data
+    print("I'd love to send", self.n)
+    if self.state:
+      print(self.state)
+    
     if self.mock != None:
       self.mock.update_paddle_pos(paddle_pos)
     else:
@@ -100,7 +104,7 @@ class Session:
     while not self.stop:
       data, addr = self.sock.recvfrom(1024)
       packet = data.decode('utf-8')
-      print('INCOMING MESSAGE', packet)
+      #print('INCOMING MESSAGE', packet)
       packet = json.loads(packet)
       self.state = packet
       

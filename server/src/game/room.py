@@ -71,8 +71,8 @@ def connect(room_id, state, socket, addr):
         room_state["player_2_id"] = random.getrandbits(32)
         room_state["player_2_addr"] = addr
         room_state["player_2_socket"] = socket
-        init()
         answer(socket, addr)
+        init()
 
 
 def update(delta_time):
