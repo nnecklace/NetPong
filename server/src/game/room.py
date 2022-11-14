@@ -97,8 +97,8 @@ def update(delta_time):
         if (room_state['ball_pos'][1] <= room_state['paddle_positions'][1] + HALF_PAD_HEIGHT and room_state['ball_pos'][1] >= room_state['paddle_positions'][1] - HALF_PAD_HEIGHT):
             if room_state['ball_velocity'][0] > 0:
                 bounce_from_paddle(1)
-            elif room_state['ball_pos'][0] >= 1 - BALL_WIDTH/2:
-                score(0)
+        elif room_state['ball_pos'][0] >= 1 - BALL_WIDTH/2:
+            score(0)
 
 
 def ball_init(right):
