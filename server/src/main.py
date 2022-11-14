@@ -10,7 +10,7 @@ def start(room_id, state, socket):
 
 
 def create_message(msg, addr, timestamp, data={}):
-    return {'message': msg, 'addr': addr, 'timestamp': timestamp, 'data': data}
+    return {'message': msg, 'addr': addr, 'timestamp': timestamp, 'data': json.loads(data)}
 
 
 if __name__ == '__main__':
