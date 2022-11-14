@@ -178,7 +178,7 @@ def run(room_id, state, socket):
             if next['timestamp'] > room_state['last_updated']:
                 data = next['data']
                 room_state['last_updated'] = current_time
-                print('message:', message)
+                print('message:', next['message'])
                 if next['message'] == 'connect':
                     print('connecting very much')
                     connect(room_id, state, socket, addr)
