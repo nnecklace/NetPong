@@ -181,19 +181,19 @@ def run(id, state, socket):
                     elif next['message'] == 'update':
                         print('updating')
                         update_paddle(0,0)
+        
+        except Exception:
+            print('fuck')
+            #socket.sendto(str.encode('wat'), addr)
 
         # Updates game state 60 times per second
-        if (delta_time > TICK_RATE)
+        if delta_time > TICK_RATE:
             #update
             print(f'Updating game room {id} with state {room_state}...')
             update(state, delta_time)
             #send state
             if room_state['state'] == 'running':
                 answer(room_state['player_1_socket'],
-                       room_state['player_1_addr'])
+                    room_state['player_1_addr'])
                 #answer(room_state['player_2_socket'],
                 #       room_state['player_2_addr'])
-        
-        except Exception:
-            print('fuck')
-            #socket.sendto(str.encode('wat'), addr)
