@@ -55,9 +55,11 @@ def start(room_id, state, socket):
 
 
 def answer(socket, addr):
+    print('Answering with state:', room_state)
     response = {k: i for k, i in room_state.items(
-    ) if k != "player_1_socket" and k != "player_2_socket"}
+    ) if k != "player_1_socket" and k != "player_2_socket" and "player_1_addr" and "player_2_addr"}
     res = json.dumps(response)
+    print('res:',res)
     socket.sendto(str.encode(res), addr)
 
 
@@ -151,11 +153,6 @@ def bounce_from_paddle(paddle):
     game['ball_velocity'] = [new_dir[0] * speed, new_dir[1] * speed]
 
 def update_paddle(player_id, paddle_pos):
-    print('debug')
-    print(player_id)
-    print(room_state['player_1_id'])
-    print(paddle_pos)
-    print(room_state['paddle_positions'])
     if player_id == room_state['player_1_id']:
         room_state['paddle_positions'][0] = paddle_pos
     elif player_id == room_state['player_2_id']:
