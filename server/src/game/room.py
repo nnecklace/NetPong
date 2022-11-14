@@ -75,9 +75,7 @@ def connect(room_id, state, socket, addr):
 def update(delta_time):
     print('Updating ball position')
     print('delta_time:', delta_time)
-    print('ball vel:', room_state['ball_vel'])
-    print('ball vel x:', ball_vel[0])
-    print('ball vel y:', ball_vel[1])
+    print('ball vel:', room_state['ball_velocity'])
     print('old pos:', room_state['ball_pos'])
     print('x delta', room_state['ball_velocity'][0] * delta_time)
     print('y delta', room_state['ball_velocity'][1] * delta_time)
@@ -118,7 +116,7 @@ def ball_init(right):
     if not right:
         horz = - horz
 
-    room_state['ball_vel'] = [horz, -vert]
+    room_state['ball_velocity'] = [horz, -vert]
 
 
 def init():
