@@ -154,18 +154,24 @@ def run(id, state, socket):
     delta_time = 1/60
 
     while True:
-        time.sleep(5)
+        # time.sleep(5)
         print(f'game room {id} with state {room_state}')
-        if room_state['state'] == 'running':
-            answer(room_state['player_1_socket'], room_state['player_1_addr'])
-            answer(room_state['player_2_socket'], room_state['player_2_addr'])
-        if len(state) > 0:
-            next = state.pop()
-            addr = next['addr']
-            if next['timestamp'] > room_state['last_updated']:
-                room_state['last_updated'] = time.time()
-                if next['message'] == 'connect':
-                    connect(id, state, socket, addr)
-                elif next['message'] == 'update':
-                    print('updating')
-                    update(id, state, socket, addr, delta_time)
+        try:
+            if room_state['state'] == 'running':
+                answer(room_state['player_1_socket'],
+                       room_state['player_1_addr'])
+                answer(room_state['player_2_socket'],
+                       room_state['player_2_addr'])
+            if len(state) > 0:
+                next = state.pop()
+                addr = next['addr']
+                if next['timestamp'] > room_state['last_updated']:
+                    room_state['last_updated'] = time.time()
+                    if next['message'] == 'connect':
+                        connect(id, state, socket, addr)
+                    elif next['message'] == 'update':
+                        print('updating')
+                        update(id, state, socket, addr, delta_time)
+        except Exception:
+            print('fuck')
+            #socket.sendto(str.encode('wat'), addr)
