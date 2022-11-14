@@ -20,7 +20,6 @@ TICK_RATE = 1/TICKS_PER_SECOND
 
 room_state = {
     "player_1_id": random.getrandbits(32),
-    "player_1_pos": 0.5,
     "ball_pos": [0.5, 0.5],
     "ball_velocity": [0, 0],
     "paddle_positions": [0.5, 0.5],
@@ -153,9 +152,9 @@ def bounce_from_paddle(paddle):
 
 def update_paddle(player_id, paddle_pos):
     if player_id == room_state.player_1_id:
-        paddle_pos[0] = paddle_pos
+        room_state['paddle_positions'][0] = paddle_pos
     elif player_id == room.state.player_2_id:
-        paddle_pos[1] = paddle_pos
+        room_state['paddle_positions'][1] = paddle_pos
 
 
 # Kill room if there are no connections for 10 seconds
