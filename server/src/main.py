@@ -9,8 +9,10 @@ def start(room_id, state, socket):
     room.start(room_id, state, socket)
 
 
-def create_message(msg, addr, timestamp, data={}):
-    return {'message': msg, 'addr': addr, 'timestamp': timestamp, 'data': json.loads(data.decode('utf-8'))}
+def create_message(msg, addr, timestamp, data=None):
+    if data != None:
+        data = json.loads(data.decode('utf-8'))
+    return {'message': msg, 'addr': addr, 'timestamp': timestamp, 'data': data}
 
 
 if __name__ == '__main__':
