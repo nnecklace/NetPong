@@ -75,7 +75,7 @@ def connect(room_id, state, socket, addr):
 
 def update(state, delta_time):
     room_state['ball_pos'][0] += room_state['ball_velocity'][0] * delta_time
-    room['ball_pos'][1] += room_state['ball_velocity'][1] * delta_time
+    room_state['ball_pos'][1] += room_state['ball_velocity'][1] * delta_time
 
     # ball collision check on top and bottom walls
     if room_state['ball_pos'][1] <= BALL_HEIGHT/2:
