@@ -179,21 +179,21 @@ def run(room_id, state, socket):
         delta_time = current_time - prev_tick
         # time.sleep(5)
 
-        try:
-            if len(state) > 0:
-                next = state.pop()
-                addr = next['addr']
-                if next['timestamp'] > room_state['last_updated']:
-                    data = next['data']
-                    room_state['last_updated'] = current_time
-                    if next['message'] == 'connect':
-                        connect(room_id, state, socket, addr)
-                    elif next['message'] == 'update':
-                        print('updating paddle_position based on ', data)
-                        update_paddle(data.player_id,data.paddle_pos)
+        #try:
+        if len(state) > 0:
+            next = state.pop()
+            addr = next['addr']
+            if next['timestamp'] > room_state['last_updated']:
+                data = next['data']
+                room_state['last_updated'] = current_time
+                if next['message'] == 'connect':
+                    connect(room_id, state, socket, addr)
+                elif next['message'] == 'update':
+                    print('updating paddle_position based on ', data)
+                    update_paddle(data['player_id'],data['paddle_pos'])
         
-        except Exception:
-            print('fuck')
+        #except Exception:
+        #    print('fuck')
             #socket.sendto(str.encode('wat'), addr)
 
         # Updates game state 60 times per second
