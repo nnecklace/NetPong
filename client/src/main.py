@@ -29,7 +29,7 @@ HEIGHT = 400
 paddle0_vel = 0
 paddle1_vel = 0
 ROOM_ID_MAX_CHARACTERS = 5
-enter_room_id_text = ''
+room_id_text = ''
 
 
 #surface declaration
@@ -97,10 +97,10 @@ def draw_menu(surface):
   label1 = myfont1.render('NETPONG', 1, WHITE)
   surface.blit(label1, (frac_to_px(.24, WIDTH), frac_to_px(.05, HEIGHT)))
 
-def draw_enter_room_id(surface):
-  global enter_room_id_text
+def draw_room_id(surface):
+  global room_id_text
   surface.fill(BLACK)
-  draw_button(surface, 0, (enter_room_id_text + '_'), False)
+  draw_button(surface, 0, (room_id_text + '_'), False)
 
   myfont1 = pygame.font.SysFont("agencyfb", int(frac_to_px(.1, HEIGHT)), bold=True)
   label1 = myfont1.render('ENTER ROOM ID', 1, WHITE)
@@ -200,7 +200,7 @@ def draw_game(surface):
     
 #keydown handler
 def keydown(event):
-  global STATE, CHOSEN_BUTTON, enter_room_id_text
+  global STATE, CHOSEN_BUTTON, room_id_text
   global paddle0_vel, paddle1_vel
   if (STATE == 'MENU'):
     if event.key == K_RETURN or event.key == K_SPACE:
@@ -216,14 +216,14 @@ def keydown(event):
       paddle0_vel = PADDLE_VEL
   elif (STATE == 'ENTER_ROOM_ID'):
     if event.key == K_RETURN:
-      session.init_connection('join')
+      session.init_connection('join', room_id_text)
     elif event.key == K_BACKSPACE:
-      enter_room_id_text = enter_room_id_text[:-1]
+      room_id_text = room_id_text[:-1]
     elif event.key == K_ESCAPE:
       STATE = 'MENU'
-      enter_room_id_text = ''
-    elif len(enter_room_id_text) < ROOM_ID_MAX_CHARACTERS:
-      enter_room_id_text += event.unicode
+      room_id_text = ''
+    elif len(room_id_text) < ROOM_ID_MAX_CHARACTERS:
+      room_id_text += event.unicode
     
 
 #keyup handler
@@ -242,7 +242,7 @@ while True:
     if (STATE == 'MENU'):
         draw_menu(window)
     elif (STATE == 'ENTER_ROOM_ID'):
-        draw_enter_room_id(window)
+        draw_room_id(window)
     elif (STATE == 'PLAYING'):
         draw_game(window)
     elif (STATE == 'GAME_END'):

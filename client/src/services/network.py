@@ -38,6 +38,17 @@ class Session:
             'paddle_pos': paddle_pos
             }
           },)), (SERVER_IP, SERVER_PORT))
+      elif self.sock and self.state and (self.n == 2 and 'player_2_id' in self.state and self.state['player_2_id'] != 0):
+        #print('state:',self.state)
+        self.sock.sendto(str.encode(json.dumps({
+          'message': 'update',
+          'timestamp': time.time(),
+          'data': {
+            'room_id': self.state['room_id'],
+            'player_id': self.state['player_2_id'],
+            'paddle_pos': paddle_pos
+            }
+          },)), (SERVER_IP, SERVER_PORT))
   
   def get_state(self):
     if self.mock == None:
@@ -59,13 +70,15 @@ class Session:
     self.rec_thread.join()
     print('quitting you fuck')
 
-  def init_connection(self, mode, id=0):
+  def init_connection(self, mode, room_id=0):
     print('initiating connection', mode, id)
     if mode == 'start':
       self.sock.sendto(str.encode(json.dumps({'message': 'start', 'timestamp': time.time()})), (SERVER_IP, SERVER_PORT))
       self.rec_thread.start()
       self.n = 1
     if mode == 'join':
+      self.sock.sendto(str.encode(json.dumps({'message': 'start', 'timestamp': time.time(), 'data': {'room_id': room_id}})), (SERVER_IP, SERVER_PORT))
+      self.n = 2
       print("i ain't connecting to no shit ho :D")
     #  sock.sendto('connect', (SERVER_IP, SERVER_PORT))
 
