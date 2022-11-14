@@ -28,19 +28,18 @@ if __name__ == '__main__':
     while True:
         data, addr = sock.recvfrom(1024)
         packet = data.decode('utf-8')
-        #print("message %s" % packet)
         packet = json.loads(packet)
         message = packet['message']
         timestamp = packet['timestamp']
         if message.strip() == 'start':
-            print('start recv')
+            print("start recv, message %s" % packet)
             room_id = random.randint(1, 10)
             state[room_id] = manager.list()
             state[room_id].append(create_message('start', addr, timestamp))
             p = Process(target=start, args=(room_id, state[room_id], sock))
             p.start()
         elif message.strip() == 'connect':
-            print('connect recv')
+            print("connect recv, message %s" % packet)
             room_id = packet['data']['room_id']
             state[room_id].append(create_message('connect', addr, timestamp, packet['data']))
         elif message.strip() == 'update':
