@@ -115,7 +115,9 @@ def ball_init(right):
 
 
 def init():
+    print('Initializing...')
     room_state['state'] = 'running'
+    print('Room state set to', room_state['state'])
     room_state['winner'] = 0
     if random.randrange(0, 2) == 0:
         ball_init(True)
