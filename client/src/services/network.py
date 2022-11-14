@@ -30,7 +30,15 @@ class Session:
     else:
       if self.sock and self.state and (self.n == 1 and 'player_1_id' in self.state and self.state['player_1_id'] != 0):
         print('state:',self.state)
-        self.sock.sendto(str.encode(json.dumps({'id': self.state['room_id'],'message': 'update', 'timestamp': time.time()})), (SERVER_IP, SERVER_PORT))
+        self.sock.sendto(str.encode(json.dumps({
+          'message': 'update',
+          'timestamp': time.time()},
+          'data': {
+            'room_id': self.state['room_id'],
+            'player_id': self.state['player_1_id'],
+            'paddle_pos': self.state[paddle_pos]
+            }
+          )), (SERVER_IP, SERVER_PORT))
   
   def get_state(self):
     if self.mock == None:
