@@ -62,6 +62,7 @@ def answer(socket, addr):
     ) if k != "player_1_socket" and k != "player_2_socket" and "player_1_addr" and "player_2_addr"}
     res = json.dumps(response)
     #print('res:',res)
+    print('sending to ', addr)
     socket.sendto(str.encode(res), addr)
 
 
