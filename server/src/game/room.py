@@ -159,8 +159,8 @@ def update_paddle(player_id, paddle_pos):
 
 # Kill room if there are no connections for 10 seconds
 def should_kill():
-    if time.time() - room_state['player_1_last_update'] > KILL_TIMEOUT and
-        time.time() - room_state['player_1_last_update'] > KILL_TIMEOUT:
+    if (time.time() - room_state['player_1_last_update'] > KILL_TIMEOUT and
+        time.time() - room_state['player_1_last_update'] > KILL_TIMEOUT):
         return True
     else:
         return False
