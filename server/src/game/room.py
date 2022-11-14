@@ -74,36 +74,34 @@ def connect(room_id, state, socket, addr):
 
 
 def update(state, delta_time):
-    game = room_state
-    game['ball_pos'][0] += game['ball_velocity'][0] * delta_time
-    game['ball_pos'][1] += game['ball_velocity'][1] * delta_time
+    room_state['ball_pos'][0] += room_state['ball_velocity'][0] * delta_time
+    room['ball_pos'][1] += room_state['ball_velocity'][1] * delta_time
 
     # ball collision check on top and bottom walls
-    if game['ball_pos'][1] <= BALL_HEIGHT/2:
-        game['ball_velocity'][1] = - game['ball_velocity'][1]
-    if game['ball_pos'][1] >= 1 - BALL_HEIGHT/2:
-        game['ball_velocity'][1] = - game['ball_velocity'][1]
+    if room_state['ball_pos'][1] <= BALL_HEIGHT/2:
+        room_state['ball_velocity'][1] = - room_state['ball_velocity'][1]
+    if room_state['ball_pos'][1] >= 1 - BALL_HEIGHT/2:
+        room_state['ball_velocity'][1] = - room_state['ball_velocity'][1]
     # if someone scores, do something
 
     # ball collison check on gutters or paddles
-    if game['ball_pos'][0] <= BALL_WIDTH/2 + PAD_WIDTH:
-        if (game['ball_pos'][1] <= game['paddle_positions'][0] + HALF_PAD_HEIGHT
-                and game['ball_pos'][1] >= game['paddle_positions'][0] - HALF_PAD_HEIGHT):
-            if game['ball_velocity'][0] < 0:
+    if room_state['ball_pos'][0] <= BALL_WIDTH/2 + PAD_WIDTH:
+        if (room_state['ball_pos'][1] <= room_state['paddle_positions'][0] + HALF_PAD_HEIGHT
+                and room_state['ball_pos'][1] >= room_state['paddle_positions'][0] - HALF_PAD_HEIGHT):
+            if room_state['ball_velocity'][0] < 0:
                 bounce_from_paddle(0)
-        elif game['ball_pos'][0] <= BALL_WIDTH/2:
+        elif room_state['ball_pos'][0] <= BALL_WIDTH/2:
             score(1)
-    elif game['ball_pos'][0] >= 1 - (BALL_WIDTH/2 + PAD_WIDTH):
-        if (game['ball_pos'][1] <= game['paddle_positions'][1] + HALF_PAD_HEIGHT and game['ball_pos'][1] >= game['paddle_positions'][1] - HALF_PAD_HEIGHT):
-            if game['ball_velocity'][0] > 0:
+    elif room_state['ball_pos'][0] >= 1 - (BALL_WIDTH/2 + PAD_WIDTH):
+        if (room_state['ball_pos'][1] <= room_state['paddle_positions'][1] + HALF_PAD_HEIGHT and room_state['ball_pos'][1] >= room_state['paddle_positions'][1] - HALF_PAD_HEIGHT):
+            if room_state['ball_velocity'][0] > 0:
                 bounce_from_paddle(1)
-            elif game['ball_pos'][0] >= 1 - BALL_WIDTH/2:
+            elif room_state['ball_pos'][0] >= 1 - BALL_WIDTH/2:
                 score(0)
 
 
 def ball_init(right):
-    game = room_state
-    game['ball_pos'] = [0.5, 0.5]
+    room_state['ball_pos'] = [0.5, 0.5]
     #horz = px_to_frac(random.randrange(2,4), 600)
     horz = random.uniform(BALL_HORZ_RANGE[0], BALL_HORZ_RANGE[1])
     #vert = px_to_frac(random.randrange(0,3), 400)
@@ -113,13 +111,12 @@ def ball_init(right):
     if not right:
         horz = - horz
 
-    game['ball_vel'] = [horz, -vert]
+    room_state['ball_vel'] = [horz, -vert]
 
 
 def init():
-    game = room_state
-    game['state'] = 'running'
-    game['winner'] = 0
+    room_state['state'] = 'running'
+    room_state['winner'] = 0
     if random.randrange(0, 2) == 0:
         ball_init(True)
     else:
@@ -127,30 +124,28 @@ def init():
 
 
 def score(p):
-    game = room_state
-    game['score'][p] += 1
-    if game['score'][p] >= WINNING_SCORE:
-        game['state'] = 'ended'
-        game['winner'] = p
+    room_state['score'][p] += 1
+    if room_state['score'][p] >= WINNING_SCORE:
+        room_state['state'] = 'ended'
+        room_state['winner'] = p
     else:
         ball_init(p == 1)
 
 
 def bounce_from_paddle(paddle):
-    game = room_state
-    game['ball_velocity'][0] = -game['ball_velocity'][0]
-    game['ball_velocity'][0] *= BOUNCE_SPEED_UP
-    game['ball_velocity'][1] *= BOUNCE_SPEED_UP
+    room_state['ball_velocity'][0] = -room_state['ball_velocity'][0]
+    room_state['ball_velocity'][0] *= BOUNCE_SPEED_UP
+    room_state['ball_velocity'][1] *= BOUNCE_SPEED_UP
     # get speed
-    speed = mag(game['ball_velocity'])
+    speed = mag(room_state['ball_velocity'])
     # get diff from paddle middle
-    diff_frac = (game['ball_pos'][1] -
-                 game['paddle_positions'][paddle]) / HALF_PAD_HEIGHT
+    diff_frac = (room_state['ball_pos'][1] -
+                 room_state['paddle_positions'][paddle]) / HALF_PAD_HEIGHT
     # calculate new direction vector
     new_dir = normalize(
-        [game['ball_velocity'][0] / abs(game['ball_velocity'][0]), diff_frac])
+        [room_state['ball_velocity'][0] / abs(room_state['ball_velocity'][0]), diff_frac])
     # multiply by speed
-    game['ball_velocity'] = [new_dir[0] * speed, new_dir[1] * speed]
+    room_state['ball_velocity'] = [new_dir[0] * speed, new_dir[1] * speed]
 
 def update_paddle(player_id, paddle_pos):
     if player_id == room_state['player_1_id']:
@@ -186,7 +181,7 @@ def run(room_id, state, socket):
                 if next['message'] == 'connect':
                     connect(room_id, state, socket, addr)
                 elif next['message'] == 'update':
-                    print('updating paddle_position based on ', data)
+                    #print('updating paddle_position based on ', data)
                     update_paddle(data['player_id'],data['paddle_pos'])
         
         #except Exception:

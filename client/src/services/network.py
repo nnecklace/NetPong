@@ -29,7 +29,7 @@ class Session:
       self.mock.update_paddle_pos(paddle_pos)
     else:
       if self.sock and self.state and (self.n == 1 and 'player_1_id' in self.state and self.state['player_1_id'] != 0):
-        print('state:',self.state)
+        #print('state:',self.state)
         self.sock.sendto(str.encode(json.dumps({
           'message': 'update',
           'timestamp': time.time(),
