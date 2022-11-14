@@ -15,7 +15,6 @@ class Session:
     self.mock = mock_game
     self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     self.sock.bind(('', 5005))
-    self.game = GameState()
     self.state = None
     self.rec_thread = threading.Thread(target=self.rec, args=())
     self.n = 0
@@ -42,7 +41,14 @@ class Session:
   
   def get_state(self):
     if self.mock == None:
-      return self.game
+      game = GameState()
+      print(self.state)
+      if self.state != None:
+        game.paddle_positions = self.state['paddle_positions']
+        game.ball_pos = self.state['ball_pos']
+        game.score = self.state['score']
+        game.winner = self.state['winner']
+      return game
     return self.mock.game
 
   def quit(self):

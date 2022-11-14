@@ -55,7 +55,6 @@ def start(room_id, state, socket):
 
 
 def answer(socket, addr):
-    print('Answering with state:', room_state)
     response = {k: i for k, i in room_state.items(
     ) if k != "player_1_socket" and k != "player_2_socket" and "player_1_addr" and "player_2_addr"}
     res = json.dumps(response)
@@ -73,9 +72,15 @@ def connect(room_id, state, socket, addr):
         answer(socket, addr)
 
 
-def update(state, delta_time):
+def update(delta_time):
+    print('Updating ball position')
+    print('delta_time:', delta_time)
+    print('ball vel:', ball_vel)
+    print('old pos:', room_state['ball_pos'])
     room_state['ball_pos'][0] += room_state['ball_velocity'][0] * delta_time
     room_state['ball_pos'][1] += room_state['ball_velocity'][1] * delta_time
+    print('new pos:', room_state['ball_pos'])
+
 
     # ball collision check on top and bottom walls
     if room_state['ball_pos'][1] <= BALL_HEIGHT/2:
@@ -102,9 +107,7 @@ def update(state, delta_time):
 
 def ball_init(right):
     room_state['ball_pos'] = [0.5, 0.5]
-    #horz = px_to_frac(random.randrange(2,4), 600)
     horz = random.uniform(BALL_HORZ_RANGE[0], BALL_HORZ_RANGE[1])
-    #vert = px_to_frac(random.randrange(0,3), 400)
     vert = random.uniform(BALL_VERT_RANGE[0], BALL_VERT_RANGE[1])
     if random.randrange(0, 2) == 0:
         vert = -vert
@@ -193,8 +196,8 @@ def run(room_id, state, socket):
         # Updates game state 60 times per second
         if delta_time > TICK_RATE:
             #update
-            print(f'Updating game room {room_id} with state {room_state}...')
-            update(state, delta_time)
+            #print(f'Updating game room {room_id} with state {room_state}...')
+            update(delta_time)
             #send state
             if room_state['state'] == 'running':
                 answer(room_state['player_1_socket'],
