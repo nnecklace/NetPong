@@ -28,6 +28,8 @@ WIDTH = 600
 HEIGHT = 400
 paddle0_vel = 0
 paddle1_vel = 0
+ROOM_ID_MAX_CHARACTERS = 5
+enter_room_id_text = ''
 
 
 #surface declaration
@@ -43,11 +45,10 @@ def press_button():
     else:
       session.init_connection('start')
   elif CHOSEN_BUTTON == 1:
-    STATE = 'PLAYING'
+    STATE = 'ENTER_ROOM_ID'
     if mock != None:
       mock.init()
-    else:
-      session.init_connection('join')
+      
   elif CHOSEN_BUTTON == 2:
     pygame.quit()
     session.quit()
@@ -92,10 +93,18 @@ def draw_menu(surface):
   draw_button(surface, 0, 'JOIN', CHOSEN_BUTTON == 1)
   draw_button(surface, 1, 'EXIT', CHOSEN_BUTTON == 2)
   # TITLE
-  font_height = .2
-  myfont1 = pygame.font.SysFont("agencyfb", int(frac_to_px(font_height, HEIGHT)), bold=True)
+  myfont1 = pygame.font.SysFont("agencyfb", int(frac_to_px(.2, HEIGHT)), bold=True)
   label1 = myfont1.render('NETPONG', 1, WHITE)
   surface.blit(label1, (frac_to_px(.24, WIDTH), frac_to_px(.05, HEIGHT)))
+
+def draw_enter_room_id(surface):
+  global enter_room_id_text
+  surface.fill(BLACK)
+  draw_button(surface, 0, (enter_room_id_text + '_'), False)
+
+  myfont1 = pygame.font.SysFont("agencyfb", int(frac_to_px(.1, HEIGHT)), bold=True)
+  label1 = myfont1.render('ENTER ROOM ID', 1, WHITE)
+  surface.blit(label1, (frac_to_px(.29, WIDTH), frac_to_px(.35, HEIGHT)))
 
 def end_game(p):
   global STATE, win_time
@@ -118,12 +127,7 @@ def draw_end(surface):
 
 def update_state():
   global game, session
-  net_state = session.get_state()
-  game.paddle_positions = net_state.paddle_positions
-  game.score = net_state.score
-  game.ball_pos = net_state.ball_pos
-  game.state = net_state.state
-  game.winner = net_state.winner
+  game = session.get_state()
   if game.state == 'ended':
     end_game(game.winner)
 
@@ -137,6 +141,11 @@ def draw_game(surface):
   pygame.draw.line(surface, WHITE, [0, 1], [WIDTH, 1], 1)
   pygame.draw.line(surface, WHITE, [0, HEIGHT-1], [WIDTH, HEIGHT-1], 1)
   pygame.draw.circle(surface, WHITE, [WIDTH//2, HEIGHT//2], 70, 1)
+
+  #draw room id in top left corner
+  myfont0 = pygame.font.SysFont("agencyfb", 20)
+  label0 = myfont0.render("ROOM ID:  "+str(game.room_id), 1, WHITE)
+  surface.blit(label0, (2,2))
 
   # update paddle's vertical position, keep paddle on the screen
   if game.paddle_positions[0] > HALF_PAD_HEIGHT and game.paddle_positions[0] < 1 - HALF_PAD_HEIGHT:
@@ -191,7 +200,7 @@ def draw_game(surface):
     
 #keydown handler
 def keydown(event):
-  global STATE, CHOSEN_BUTTON
+  global STATE, CHOSEN_BUTTON, enter_room_id_text
   global paddle0_vel, paddle1_vel
   if (STATE == 'MENU'):
     if event.key == K_RETURN or event.key == K_SPACE:
@@ -205,6 +214,16 @@ def keydown(event):
       paddle0_vel = -PADDLE_VEL
     elif event.key == K_s:
       paddle0_vel = PADDLE_VEL
+  elif (STATE == 'ENTER_ROOM_ID'):
+    if event.key == K_RETURN:
+      session.init_connection('join')
+    elif event.key == K_BACKSPACE:
+      enter_room_id_text = enter_room_id_text[:-1]
+    elif event.key == K_ESCAPE:
+      STATE = 'MENU'
+      enter_room_id_text = ''
+    elif len(enter_room_id_text) < ROOM_ID_MAX_CHARACTERS:
+      enter_room_id_text += event.unicode
     
 
 #keyup handler
@@ -222,6 +241,8 @@ def keyup(event):
 while True:
     if (STATE == 'MENU'):
         draw_menu(window)
+    elif (STATE == 'ENTER_ROOM_ID'):
+        draw_enter_room_id(window)
     elif (STATE == 'PLAYING'):
         draw_game(window)
     elif (STATE == 'GAME_END'):

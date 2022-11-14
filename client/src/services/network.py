@@ -4,7 +4,7 @@ from config import config
 
 SERVER_IP = config["SERVER_IP"]
 SERVER_PORT = config["SERVER_PORT"]
-print('Client connecting to', SERVER_IP, 'port', SERVER_PORT)
+print('Server address set to ', SERVER_IP, 'port', SERVER_PORT)
 
 class Session:
 
@@ -48,6 +48,8 @@ class Session:
         game.ball_pos = self.state['ball_pos']
         game.score = self.state['score']
         game.winner = self.state['winner']
+        game.room_id = self.state['room_id']
+        print(game.room_id, self.state['room_id'])
       return game
     return self.mock.game
 

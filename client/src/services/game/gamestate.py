@@ -5,3 +5,4 @@ class GameState:
   score = [0,0]
   ball_pos = [.5,.5]
   ball_vel = [0,0]
+  room_id = 0
