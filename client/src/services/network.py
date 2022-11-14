@@ -4,13 +4,21 @@ from config import config
 
 SERVER_IP = os.getenv('SERVER_IP')
 if SERVER_IP == None:
-  SERVER_IP = config["SERVER_IP"]
+  SERVER_IP = config['SERVER_IP']
+
 SERVER_PORT = os.getenv('SERVER_PORT')
 if SERVER_PORT == None:
-  SERVER_PORT = config["SERVER_PORT"]
+  SERVER_PORT = config['SERVER_PORT']
 else:
   SERVER_PORT = int(SERVER_PORT)
-print('Server address set to ', SERVER_IP, 'port', SERVER_PORT)
+
+CLIENT_PORT = os.getenv('CLIENT_PORT')
+if CLIENT_PORT == None:
+  CLIENT_PORT = config['CLIENT_PORT']
+else:
+  CLIENT_PORT = int(CLIENT_PORT)
+
+print('Server address set to ', SERVER_IP, 'port', SERVER_PORT, ', client using port', CLIENT_PORT)
 
 class Session:
 
@@ -20,7 +28,7 @@ class Session:
     self.stop = False
     self.mock = mock_game
     self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    self.sock.bind(('', SERVER_PORT))
+    self.sock.bind(('', CLIENT_PORT))
     self.state = None
     self.rec_thread = threading.Thread(target=self.rec, args=())
     self.n = 0
@@ -83,10 +91,9 @@ class Session:
       self.rec_thread.start()
       self.n = 1
     if mode == 'join':
-      self.sock.sendto(str.encode(json.dumps({'message': 'start', 'timestamp': time.time(), 'data': {'room_id': room_id}})), (SERVER_IP, SERVER_PORT))
+      print('connecting...')
+      self.sock.sendto(str.encode(json.dumps({'message': 'connect', 'timestamp': time.time(), 'data': {'room_id': room_id}})), (SERVER_IP, SERVER_PORT))
       self.n = 2
-      print("i ain't connecting to no shit ho :D")
-    #  sock.sendto('connect', (SERVER_IP, SERVER_PORT))
 
   def rec(self):
     print('starting receive thread')
