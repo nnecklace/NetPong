@@ -14,6 +14,9 @@ BOUNCE_SPEED_UP = 1.1
 PADDLE_VEL = 1.2
 BALL_HORZ_RANGE = (0.2, 0.4)
 BALL_VERT_RANGE = (0, 0.3)
+KILL_TIMEOUT = 10 # in seconds
+TICKS_PER_SECOND = 1 # for production a value of 60 should be okay
+TICK_RATE = 1/TICKS_PER_SECOND
 
 room_state = {
     "player_1_id": random.getrandbits(32),
@@ -68,10 +71,10 @@ def connect(id, state, socket, addr):
         answer(socket, addr)
 
 
-def update(id, state, socket, addr, delta_time):
+def update(state, delta_time):
     game = room_state
-    game['ball_pos'][0] += game['ball_velocity'][0] * delta_time / 1000
-    game['ball_pos'][1] += game['ball_velocity'][1] * delta_time / 1000
+    game['ball_pos'][0] += game['ball_velocity'][0] * delta_time
+    game['ball_pos'][1] += game['ball_velocity'][1] * delta_time
 
     # ball collision check on top and bottom walls
     if game['ball_pos'][1] <= BALL_HEIGHT/2:
@@ -94,8 +97,6 @@ def update(id, state, socket, addr, delta_time):
                 bounce_from_paddle(1)
             elif game['ball_pos'][0] >= 1 - BALL_WIDTH/2:
                 score(0)
-
-    answer(socket, addr)
 
 
 def ball_init(right):
@@ -149,19 +150,26 @@ def bounce_from_paddle(paddle):
     # multiply by speed
     game['ball_velocity'] = [new_dir[0] * speed, new_dir[1] * speed]
 
+def update_paddle(player_id, paddle_pos):
+    pass
+
+
+# Kill room if there are no connections for 10 seconds
+def should_kill():
+    if time.time() - room_state['last_updated'] > KILL_TIMEOUT:
+        return True
+    else return False
 
 def run(id, state, socket):
-    delta_time = 1/60
 
-    while True:
+    prev_tick = time.time()
+    
+    while not should_kill():
+        delta_time = time.time() - prev_tick
         # time.sleep(5)
-        print(f'game room {id} with state {room_state}')
+        
+
         try:
-            if room_state['state'] == 'running':
-                answer(room_state['player_1_socket'],
-                       room_state['player_1_addr'])
-                answer(room_state['player_2_socket'],
-                       room_state['player_2_addr'])
             if len(state) > 0:
                 next = state.pop()
                 addr = next['addr']
@@ -171,7 +179,20 @@ def run(id, state, socket):
                         connect(id, state, socket, addr)
                     elif next['message'] == 'update':
                         print('updating')
-                        update(id, state, socket, addr, delta_time)
+                        update_paddle(0,0)
+
+        # Updates game state 60 times per second
+        if (delta_time > TICK_RATE)
+            #update
+            print(f'Updating game room {id} with state {room_state}...')
+            update(state, delta_time)
+            #send state
+            if room_state['state'] == 'running':
+                answer(room_state['player_1_socket'],
+                       room_state['player_1_addr'])
+                #answer(room_state['player_2_socket'],
+                #       room_state['player_2_addr'])
+        
         except Exception:
             print('fuck')
             #socket.sendto(str.encode('wat'), addr)
