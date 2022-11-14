@@ -165,6 +165,7 @@ def should_kill():
 def run(id, state, socket):
 
     prev_tick = time.time()
+    room_state['last_updated'] = time.time()
     
     while not should_kill():
         current_time = time.time()
@@ -199,3 +200,5 @@ def run(id, state, socket):
                 #answer(room_state['player_2_socket'],
                 #       room_state['player_2_addr'])
             prev_tick = current_time()
+
+    print('killing room', room_state['room_id'])

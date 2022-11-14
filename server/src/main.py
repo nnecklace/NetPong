@@ -28,7 +28,7 @@ if __name__ == '__main__':
     while True:
         data, addr = sock.recvfrom(1024)
         packet = data.decode('utf-8')
-        print("message %s" % packet)
+        #print("message %s" % packet)
         packet = json.loads(packet)
         message = packet['message']
         timestamp = packet['timestamp']
@@ -44,6 +44,6 @@ if __name__ == '__main__':
             id = packet['id']
             state[id].append(create_message('connect', addr, timestamp))
         elif message.strip() == 'update':
-            print('update recv')
+            #print('update recv')
             id = packet['id']
             state[id].append(create_message('update', addr, timestamp))
