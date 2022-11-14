@@ -185,7 +185,7 @@ def run(room_id, state, socket):
                     if next['message'] == 'connect':
                         connect(room_id, state, socket, addr)
                     elif next['message'] == 'update':
-                        print('updating paddle_position')
+                        print('updating paddle_position based on ', data)
                         update_paddle(data.player_id,data.paddle_pos)
         
         except Exception:
