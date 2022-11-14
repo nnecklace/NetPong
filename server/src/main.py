@@ -10,8 +10,6 @@ def start(room_id, state, socket):
 
 
 def create_message(msg, addr, timestamp, data=None):
-    if data != None:
-        data = json.loads(data.decode('utf-8'))
     return {'message': msg, 'addr': addr, 'timestamp': timestamp, 'data': data}
 
 
@@ -44,8 +42,8 @@ if __name__ == '__main__':
         elif message.strip() == 'connect':
             print('connect recv')
             room_id = packet['data']['room_id']
-            state[room_id].append(create_message('connect', addr, timestamp, data))
+            state[room_id].append(create_message('connect', addr, timestamp, packet['data']))
         elif message.strip() == 'update':
             #print('update recv')
             room_id = packet['data']['room_id']
-            state[room_id].append(create_message('update', addr, timestamp, data))
+            state[room_id].append(create_message('update', addr, timestamp, packet['data']))
