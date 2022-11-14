@@ -179,6 +179,7 @@ def run(room_id, state, socket):
                 data = next['data']
                 room_state['last_updated'] = current_time
                 if next['message'] == 'connect':
+                    print('connecting very much')
                     connect(room_id, state, socket, addr)
                 elif next['message'] == 'update':
                     #print('updating paddle_position based on ', data)

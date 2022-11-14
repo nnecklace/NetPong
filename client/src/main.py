@@ -217,6 +217,7 @@ def keydown(event):
   elif (STATE == 'ENTER_ROOM_ID'):
     if event.key == K_RETURN:
       session.init_connection('join', room_id_text)
+      STATE = 'PLAYING'
     elif event.key == K_BACKSPACE:
       room_id_text = room_id_text[:-1]
     elif event.key == K_ESCAPE:

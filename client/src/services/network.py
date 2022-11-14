@@ -92,7 +92,7 @@ class Session:
       self.n = 1
     if mode == 'join':
       print('connecting...')
-      self.sock.sendto(str.encode(json.dumps({'message': 'connect', 'timestamp': time.time(), 'data': {'room_id': room_id}})), (SERVER_IP, SERVER_PORT))
+      self.sock.sendto(str.encode(json.dumps({'message': 'connect', 'timestamp': time.time(), 'data': {'room_id': int(room_id)}})), (SERVER_IP, SERVER_PORT))
       self.n = 2
 
   def rec(self):
