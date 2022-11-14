@@ -77,6 +77,8 @@ def update(delta_time):
     print('delta_time:', delta_time)
     print('ball vel:', room_state['ball_vel'])
     print('old pos:', room_state['ball_pos'])
+    print('x delta', room_state['ball_velocity'][0] * delta_time)
+    print('y delta', room_state['ball_velocity'][1] * delta_time)
     room_state['ball_pos'][0] += room_state['ball_velocity'][0] * delta_time
     room_state['ball_pos'][1] += room_state['ball_velocity'][1] * delta_time
     print('new pos:', room_state['ball_pos'])
