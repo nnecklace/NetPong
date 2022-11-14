@@ -199,6 +199,6 @@ def run(id, state, socket):
                     room_state['player_1_addr'])
                 #answer(room_state['player_2_socket'],
                 #       room_state['player_2_addr'])
-            prev_tick = current_time()
+            prev_tick = current_time
 
     print('killing room', room_state['room_id'])
