@@ -15,8 +15,9 @@ PADDLE_VEL = 1.2
 BALL_HORZ_RANGE = (0.2, 0.4)
 BALL_VERT_RANGE = (0, 0.3)
 KILL_TIMEOUT = 10 # in seconds
-TICKS_PER_SECOND = 1 # for production a value of 60 should be okay
+TICKS_PER_SECOND = 4 # for production a value of 60 should be okay
 TICK_RATE = 1/TICKS_PER_SECOND
+BALL_SPEED_MULTIPLIER = 0.2
 
 room_state = {
     "player_1_id": random.getrandbits(32),
@@ -73,15 +74,8 @@ def connect(room_id, state, socket, addr):
 
 
 def update(delta_time):
-    print('Updating ball position')
-    print('delta_time:', delta_time)
-    print('ball vel:', room_state['ball_velocity'])
-    print('old pos:', room_state['ball_pos'])
-    print('x delta', room_state['ball_velocity'][0] * delta_time)
-    print('y delta', room_state['ball_velocity'][1] * delta_time)
-    room_state['ball_pos'][0] += room_state['ball_velocity'][0] * delta_time
-    room_state['ball_pos'][1] += room_state['ball_velocity'][1] * delta_time
-    print('new pos:', room_state['ball_pos'])
+    room_state['ball_pos'][0] += room_state['ball_velocity'][0] * delta_time * BALL_SPEED_MULTIPLIER
+    room_state['ball_pos'][1] += room_state['ball_velocity'][1] * delta_time * BALL_SPEED_MULTIPLIER
 
 
     # ball collision check on top and bottom walls
