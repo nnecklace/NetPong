@@ -104,7 +104,7 @@ class Session:
     while not self.stop:
       data, addr = self.sock.recvfrom(1024)
       packet = data.decode('utf-8')
-      #print('INCOMING MESSAGE', packet)
+      print('INCOMING MESSAGE', packet)
       packet = json.loads(packet)
       self.state = packet
       
