@@ -29,7 +29,7 @@ class Session:
       self.mock.update_paddle_pos(paddle_pos)
     else:
       if self.sock and self.state and (self.n == 1 and 'player_1_id' in self.state and self.state['player_1_id'] != 0):
-        self.sock.sendto(str.encode(json.dumps({'message': 'update', 'timestamp': time.time()})), (SERVER_ID, SERVER_PORT))
+        self.sock.sendto(str.encode(json.dumps({'message': 'update', 'timestamp': time.time()})), (SERVER_IP, SERVER_PORT))
         #print('sending datagram')
   
   def get_state(self):
@@ -51,7 +51,7 @@ class Session:
       self.n = 1
     if mode == 'join':
       print("i ain't connecting to no shit ho :D")
-    #  sock.sendto('connect', (SERVER_ID, SERVER_PORT))
+    #  sock.sendto('connect', (SERVER_IP, SERVER_PORT))
 
   def rec(self):
     print('starting receive thread')
