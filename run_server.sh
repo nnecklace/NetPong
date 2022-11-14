@@ -1,0 +1,1 @@
+python3 server/src/main.py

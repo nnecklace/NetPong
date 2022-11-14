@@ -1,11 +1,11 @@
-import time
-import socket
-import json
-import threading
+import time, socket, json, os, threading
 from services.game.gamestate import GameState
+from config import config
 
-SERVER_ID = "18.193.69.111"
-SERVER_PORT = 5005
+SERVER_IP = config["SERVER_IP"]
+SERVER_PORT = config["SERVER_PORT"]
+print('Client connecting to', SERVER_IP, 'port', SERVER_PORT)
+
 class Session:
 
   #some kind of other session data idk
@@ -46,7 +46,7 @@ class Session:
   def init_connection(self, mode, id=0):
     print('initiating connection', mode, id)
     if mode == 'start':
-      self.sock.sendto(str.encode(json.dumps({'message': 'start', 'timestamp': time.time()})), (SERVER_ID, SERVER_PORT))
+      self.sock.sendto(str.encode(json.dumps({'message': 'start', 'timestamp': time.time()})), (SERVER_IP, SERVER_PORT))
       self.rec_thread.start()
       self.n = 1
     if mode == 'join':
