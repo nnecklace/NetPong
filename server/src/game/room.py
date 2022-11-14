@@ -52,6 +52,7 @@ def start(id, state, socket):
     room_state["player_1_socket"] = socket
     answer(socket, packet['addr'])
     run(id, state, socket)
+    init()
 
 
 def answer(socket, addr):
@@ -158,7 +159,8 @@ def update_paddle(player_id, paddle_pos):
 def should_kill():
     if time.time() - room_state['last_updated'] > KILL_TIMEOUT:
         return True
-    else return False
+    else:
+        return False
 
 def run(id, state, socket):
 
@@ -167,7 +169,6 @@ def run(id, state, socket):
     while not should_kill():
         delta_time = time.time() - prev_tick
         # time.sleep(5)
-        
 
         try:
             if len(state) > 0:
