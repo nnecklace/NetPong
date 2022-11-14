@@ -2,8 +2,14 @@ import time, socket, json, os, threading
 from services.game.gamestate import GameState
 from config import config
 
-SERVER_IP = config["SERVER_IP"]
-SERVER_PORT = config["SERVER_PORT"]
+SERVER_IP = os.getenv('SERVER_IP')
+if SERVER_IP == None:
+  SERVER_IP = config["SERVER_IP"]
+SERVER_PORT = os.getenv('SERVER_PORT')
+if SERVER_PORT == None:
+  SERVER_PORT = config["SERVER_PORT"]
+else:
+  SERVER_PORT = int(SERVER_PORT)
 print('Server address set to ', SERVER_IP, 'port', SERVER_PORT)
 
 class Session:
@@ -14,7 +20,7 @@ class Session:
     self.stop = False
     self.mock = mock_game
     self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    self.sock.bind(('', 5005))
+    self.sock.bind(('', SERVER_PORT))
     self.state = None
     self.rec_thread = threading.Thread(target=self.rec, args=())
     self.n = 0
@@ -71,7 +77,7 @@ class Session:
     print('quitting you fuck')
 
   def init_connection(self, mode, room_id=0):
-    print('initiating connection', mode, id)
+    print('initiating connection', mode, room_id)
     if mode == 'start':
       self.sock.sendto(str.encode(json.dumps({'message': 'start', 'timestamp': time.time()})), (SERVER_IP, SERVER_PORT))
       self.rec_thread.start()

@@ -9,7 +9,7 @@ PAD_WIDTH = .015
 PAD_HEIGHT = .2
 HALF_PAD_WIDTH = PAD_WIDTH / 2
 HALF_PAD_HEIGHT = PAD_HEIGHT / 2
-WINNING_SCORE = 3
+WINNING_SCORE = 100
 BOUNCE_SPEED_UP = 1.1
 PADDLE_VEL = 1.2
 BALL_HORZ_RANGE = (0.2, 0.4)
@@ -51,7 +51,6 @@ def start(room_id, state, socket):
     room_state["player_1_addr"] = packet['addr']
     room_state["player_1_socket"] = socket
     answer(socket, packet['addr'])
-    init()
     run(room_id, state, socket)
 
 
