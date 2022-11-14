@@ -15,7 +15,7 @@ PADDLE_VEL = 1.2
 BALL_HORZ_RANGE = (0.2, 0.4)
 BALL_VERT_RANGE = (0, 0.3)
 KILL_TIMEOUT = 10 # in seconds
-TICKS_PER_SECOND = .2# for production a value of 60 should be okay
+TICKS_PER_SECOND = 60# for production a value of 60 should be okay
 TICK_RATE = 1/TICKS_PER_SECOND
 BALL_SPEED_MULTIPLIER = 0.5
 
@@ -186,7 +186,6 @@ def run(room_id, state, socket):
                 if next['timestamp'] > room_state['player_1_last_update'] and next['data']['player_id'] == room_state['player_1_id']:
                     data = next['data']
                     room_state['player_1_last_update'] = current_time
-                    print('message:', next['message'])
                     update_paddle(data['player_id'], data['paddle_pos'])
                 
                 elif next['timestamp'] > room_state['player_2_last_update'] and next['data']['player_id'] == room_state['player_2_id']:

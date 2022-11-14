@@ -6,3 +6,4 @@ class GameState:
   ball_pos = [.5,.5]
   ball_vel = [0,0]
   room_id = 0
+  playernumber = 0

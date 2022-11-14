@@ -42,7 +42,7 @@ class Session:
       self.mock.update_paddle_pos(paddle_pos)
     else:
       if self.sock and self.state and (self.n == 1 and 'player_1_id' in self.state and self.state['player_1_id'] != 0):
-        #print('state:',self.state)
+        print('sending updated player 1 pos')
         self.sock.sendto(str.encode(json.dumps({
           'message': 'update',
           'timestamp': time.time(),
@@ -53,7 +53,7 @@ class Session:
             }
           },)), (SERVER_IP, SERVER_PORT))
       elif self.sock and self.state and (self.n == 2 and 'player_2_id' in self.state and self.state['player_2_id'] != 0):
-        #print('state:',self.state)
+        print('sending updated player 2 pos')
         self.sock.sendto(str.encode(json.dumps({
           'message': 'update',
           'timestamp': time.time(),
@@ -74,6 +74,7 @@ class Session:
         game.score = self.state['score']
         game.winner = self.state['winner']
         game.room_id = self.state['room_id']
+        game.playernumber = self.n
       return game
     return self.mock.game
 

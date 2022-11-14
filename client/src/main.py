@@ -134,6 +134,8 @@ def update_state():
 #draw function of surface
 def draw_game(surface):
   # playing field, static
+  global game
+  update_state()
   surface.fill(BLACK)
   pygame.draw.line(surface, WHITE, [WIDTH / 2, 0],[WIDTH / 2, HEIGHT], 1)
   pygame.draw.line(surface, WHITE, [PAD_WIDTH, 0],[PAD_WIDTH, HEIGHT], 1)
@@ -148,16 +150,17 @@ def draw_game(surface):
   surface.blit(label0, (2,2))
 
   # update paddle's vertical position, keep paddle on the screen
-  if game.paddle_positions[0] > HALF_PAD_HEIGHT and game.paddle_positions[0] < 1 - HALF_PAD_HEIGHT:
-      game.paddle_positions[0] += paddle0_vel * deltatime / 1000
-  elif game.paddle_positions[0] <= HALF_PAD_HEIGHT and paddle0_vel > 0:
-      game.paddle_positions[0] += paddle0_vel * deltatime / 1000
-  elif game.paddle_positions[0] >= 1 - HALF_PAD_HEIGHT and paddle0_vel < 0:
-      game.paddle_positions[0] += paddle0_vel * deltatime / 1000
+  if game.playernumber > 0:
+    if game.paddle_positions[game.playernumber-1] > HALF_PAD_HEIGHT and game.paddle_positions[game.playernumber-1] < 1 - HALF_PAD_HEIGHT:
+        game.paddle_positions[game.playernumber-1] += paddle0_vel * deltatime / 1000
+    elif game.paddle_positions[game.playernumber-1] <= HALF_PAD_HEIGHT and paddle0_vel > 0:
+        game.paddle_positions[game.playernumber-1] += paddle0_vel * deltatime / 1000
+    elif game.paddle_positions[game.playernumber-1] >= 1 - HALF_PAD_HEIGHT and paddle0_vel < 0:
+        game.paddle_positions[game.playernumber-1] += paddle0_vel * deltatime / 1000
   
   #network functions
-  session.send(game.paddle_positions[0])
-  update_state()
+  session.send(game.paddle_positions[game.playernumber-1])
+  
   #Opponent's paddle, should be updated on the server
   """
   if game.paddle_positions[1] > HALF_PAD_HEIGHT and game.paddle_positions[1] < 1 - HALF_PAD_HEIGHT:
