@@ -17,7 +17,7 @@ BALL_VERT_RANGE = (0, 0.3)
 KILL_TIMEOUT = 10 # in seconds
 TICKS_PER_SECOND = 4 # for production a value of 60 should be okay
 TICK_RATE = 1/TICKS_PER_SECOND
-BALL_SPEED_MULTIPLIER = 0.2
+BALL_SPEED_MULTIPLIER = 0.5
 
 room_state = {
     "player_1_id": random.getrandbits(32),
