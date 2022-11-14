@@ -151,9 +151,14 @@ def bounce_from_paddle(paddle):
     game['ball_velocity'] = [new_dir[0] * speed, new_dir[1] * speed]
 
 def update_paddle(player_id, paddle_pos):
-    if player_id == room_state.player_1_id:
+    print('debug')
+    print(player_id)
+    print(room_state['player_1_id'])
+    print(paddle_pos)
+    print(room_state['paddle_positions'])
+    if player_id == room_state['player_1_id']:
         room_state['paddle_positions'][0] = paddle_pos
-    elif player_id == room.state.player_2_id:
+    elif player_id == room_state['player_2_id']:
         room_state['paddle_positions'][1] = paddle_pos
 
 
