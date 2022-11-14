@@ -167,7 +167,8 @@ def run(id, state, socket):
     prev_tick = time.time()
     
     while not should_kill():
-        delta_time = time.time() - prev_tick
+        current_time = time.time()
+        delta_time = current_time - prev_tick
         # time.sleep(5)
 
         try:
@@ -175,7 +176,7 @@ def run(id, state, socket):
                 next = state.pop()
                 addr = next['addr']
                 if next['timestamp'] > room_state['last_updated']:
-                    room_state['last_updated'] = time.time()
+                    room_state['last_updated'] = current_time
                     if next['message'] == 'connect':
                         connect(id, state, socket, addr)
                     elif next['message'] == 'update':
@@ -197,3 +198,4 @@ def run(id, state, socket):
                     room_state['player_1_addr'])
                 #answer(room_state['player_2_socket'],
                 #       room_state['player_2_addr'])
+            prev_tick = current_time()
