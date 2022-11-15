@@ -110,20 +110,21 @@ def end_game(p):
   global STATE, win_time
   print('player ' + str(p+1) + ' has won')
   STATE = 'GAME_END'
-  WINNER = p+1
   win_time = pygame.time.get_ticks()
 
 def draw_end(surface):
-  global win_time, STATE
+  global win_time, STATE, game
   surface.fill(BLACK)
   font_height = .1
   myfont1 = pygame.font.SysFont("agencyfb", int(frac_to_px(font_height, HEIGHT)), bold=True)
   label1 = myfont1.render("WINNER", 1, WHITE)
   surface.blit(label1, (frac_to_px(.42, WIDTH), frac_to_px(.43, HEIGHT)))
-  label2 = myfont1.render("P1", 1, WHITE)
+  label2 = myfont1.render("P"+str(game.winner+1), 1, WHITE)
   surface.blit(label2, (frac_to_px(.49, WIDTH), frac_to_px(.5, HEIGHT)))
   if (pygame.time.get_ticks() >= win_time + END_SCREEN_DURATION):
     STATE = 'MENU'
+    game = GameState()
+    session.close_connection()
 
 def update_state():
   global game, session
@@ -150,7 +151,6 @@ def draw_game(surface):
   surface.blit(label0, (2,2))
 
   # update paddle's vertical position, keep paddle on the screen
-  print(game.state)
   if game.playernumber > 0 and game.state == 'running':
     if game.paddle_positions[game.playernumber-1] > HALF_PAD_HEIGHT and game.paddle_positions[game.playernumber-1] < 1 - HALF_PAD_HEIGHT:
         game.paddle_positions[game.playernumber-1] += paddle0_vel * deltatime / 1000

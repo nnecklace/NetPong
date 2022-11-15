@@ -27,10 +27,9 @@ class Session:
     self.debug = mock_game != None
     self.stop = False
     self.mock = mock_game
-    self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    self.sock.bind(('', CLIENT_PORT))
+    self.sock = None
     self.state = None
-    self.rec_thread = threading.Thread(target=self.rec, args=())
+    self.rec_thread = None
     self.n = 0
 
 
@@ -84,6 +83,17 @@ class Session:
     print('quitting')
 
   def init_connection(self, mode, room_id=0):
+    self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    self.sock.bind(('', CLIENT_PORT))
+    self.rec_thread = threading.Thread(target=self.rec, args=())
+    self.state = {
+      'paddle_positions': [0.5,0.5],
+      'ball_pos': [0.5, 0.5],
+      'score': [0,0],
+      'winner': [0],
+      'room_id': 0,
+      'state': 'waiting'
+    }
     print('initiating connection', mode, room_id)
     if mode == 'start':
       self.sock.sendto(str.encode(json.dumps({'message': 'start', 'timestamp': time.time()})), (SERVER_IP, SERVER_PORT))
@@ -94,11 +104,20 @@ class Session:
       self.sock.sendto(str.encode(json.dumps({'message': 'connect', 'timestamp': time.time(), 'data': {'room_id': int(room_id)}})), (SERVER_IP, SERVER_PORT))
       self.rec_thread.start()
       self.n = 2
+  
+  def close_connection(self):
+    self.sock.close()
+    self.rec_thread.join()
+    
 
   def rec(self):
     print('starting receive thread')
     while not self.stop:
-      data, addr = self.sock.recvfrom(1024)
+      try:
+        data, addr = self.sock.recvfrom(1024)
+      except socket.error:
+        print('socket error')
+        break
       packet = data.decode('utf-8')
       #print('INCOMING MESSAGE', packet)
       packet = json.loads(packet)
