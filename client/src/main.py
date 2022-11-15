@@ -150,7 +150,8 @@ def draw_game(surface):
   surface.blit(label0, (2,2))
 
   # update paddle's vertical position, keep paddle on the screen
-  if game.playernumber > 0:
+  print(game.state)
+  if game.playernumber > 0 and game.state == 'running':
     if game.paddle_positions[game.playernumber-1] > HALF_PAD_HEIGHT and game.paddle_positions[game.playernumber-1] < 1 - HALF_PAD_HEIGHT:
         game.paddle_positions[game.playernumber-1] += paddle0_vel * deltatime / 1000
     elif game.paddle_positions[game.playernumber-1] <= HALF_PAD_HEIGHT and paddle0_vel > 0:
@@ -160,16 +161,6 @@ def draw_game(surface):
   
   #network functions
   session.send(game.paddle_positions[game.playernumber-1])
-  
-  #Opponent's paddle, should be updated on the server
-  """
-  if game.paddle_positions[1] > HALF_PAD_HEIGHT and game.paddle_positions[1] < 1 - HALF_PAD_HEIGHT:
-      game.paddle_positions[1] += paddle1_vel
-  elif game.paddle_positions[1] <= HALF_PAD_HEIGHT and paddle1_vel > 0:
-      game.paddle_positions[1] += paddle1_vel
-  elif game.paddle_positions[1] >= 1 - HALF_PAD_HEIGHT and paddle1_vel < 0:
-      game.paddle_positions[1] += paddle1_vel
-  """
 
   #draw paddles and ball
   pygame.draw.rect(surface, WHITE, (

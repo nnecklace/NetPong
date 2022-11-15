@@ -9,15 +9,16 @@ PAD_WIDTH = .015
 PAD_HEIGHT = .2
 HALF_PAD_WIDTH = PAD_WIDTH / 2
 HALF_PAD_HEIGHT = PAD_HEIGHT / 2
-WINNING_SCORE = 100
+WINNING_SCORE = 3
 BOUNCE_SPEED_UP = 1.1
 PADDLE_VEL = 1.2
 BALL_HORZ_RANGE = (0.2, 0.4)
 BALL_VERT_RANGE = (0, 0.3)
 KILL_TIMEOUT = 10 # in seconds
-TICKS_PER_SECOND = 60# for production a value of 60 should be okay
+WIN_TIMEOUT = 10
+TICKS_PER_SECOND = 60 # for production a value of 60 should be okay
 TICK_RATE = 1/TICKS_PER_SECOND
-BALL_SPEED_MULTIPLIER = 0.5
+BALL_SPEED_MULTIPLIER = 1 # 1 for production
 
 room_state = {
     "player_1_id": random.getrandbits(32),
@@ -129,6 +130,7 @@ def score(p):
     if room_state['score'][p] >= WINNING_SCORE:
         room_state['state'] = 'ended'
         room_state['winner'] = p
+        room_state['win_time'] = time.time()
     else:
         ball_init(p == 1)
 
@@ -157,8 +159,10 @@ def update_paddle(player_id, paddle_pos):
 
 # Kill room if there are no connections for 10 seconds
 def should_kill():
-    if (time.time() - room_state['player_1_last_update'] > KILL_TIMEOUT and
-        time.time() - room_state['player_1_last_update'] > KILL_TIMEOUT):
+    current = time.time()
+    if ((current - room_state['player_1_last_update'] > KILL_TIMEOUT and
+        current - room_state['player_1_last_update'] > KILL_TIMEOUT) or
+        (room_state['state'] == 'ended' and current - room_state['win_time'] > WIN_TIMEOUT)):
         return True
     else:
         return False
@@ -200,11 +204,12 @@ def run(room_id, state, socket):
             #update
             update(delta_time)
             #send state
-            if room_state['state'] == 'running':
+            if room_state['state'] == 'running' or room_state['state'] == 'ended':
                 answer(room_state['player_1_socket'],
                     room_state['player_1_addr'])
                 answer(room_state['player_2_socket'],
                        room_state['player_2_addr'])
+
             prev_tick = current_time
 
     print('killing room', room_state['room_id'])

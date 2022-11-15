@@ -72,6 +72,7 @@ class Session:
         game.score = self.state['score']
         game.winner = self.state['winner']
         game.room_id = self.state['room_id']
+        game.state = self.state['state']
         game.playernumber = self.n
       return game
     return self.mock.game
