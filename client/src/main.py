@@ -204,9 +204,9 @@ def keydown(event):
     if event.key == K_DOWN:
       CHOSEN_BUTTON = (CHOSEN_BUTTON + 1) % 3
   elif (STATE == 'PLAYING'):
-    if event.key == K_w:
+    if event.key == K_UP:
       paddle0_vel = -PADDLE_VEL
-    elif event.key == K_s:
+    elif event.key == K_DOWN:
       paddle0_vel = PADDLE_VEL
   elif (STATE == 'ENTER_ROOM_ID'):
     if event.key == K_RETURN:

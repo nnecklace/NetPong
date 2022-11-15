@@ -27,3 +27,9 @@ Regardless of where the server is hosted, make sure that incoming UDP messages t
 ### Running the Server
 
 To run the program on Linux or Mac, simply execute the script `run_server.sh`. If this doesn't work, try changing `python3` to just `python` in the file. On Windows, just make sure you have Python installed and you should be able to just double click the `main.py` file in `server/src/`. The server runs by default on port 5005, but this can be edited in the source code.
+
+## Playing the game
+
+The user interface uses nothing but keyboard inputs for control, so menu buttons can not be pressed using mouse or touch devices. In the menu, the user can navigate through the different buttons using arrow keys and press the return or space bar keys to select any action. Inside the game, the player can move their own paddle using the up and down arrow keys. The game starts only once two players have connected.
+
+**Note: In the current build the game crashes if a player tries to join a room that does not exist!**
