@@ -52,7 +52,6 @@ def start(room_id, state, socket):
     room_state["room_id"] = room_id
     room_state["player_1_addr"] = packet['addr']
     room_state["player_1_socket"] = socket
-    print(socket, packet['addr'])
     answer(socket, packet['addr'])
     run(room_id, state, socket)
 
@@ -61,8 +60,6 @@ def answer(socket, addr):
     response = {k: i for k, i in room_state.items(
     ) if k != "player_1_socket" and k != "player_2_socket" and "player_1_addr" and "player_2_addr"}
     res = json.dumps(response)
-    #print('res:',res)
-    print('sending to ', addr)
     socket.sendto(str.encode(res), addr)
 
 
@@ -73,7 +70,6 @@ def connect(room_id, state, socket, addr):
         room_state["player_2_id"] = random.getrandbits(32)
         room_state["player_2_addr"] = addr
         room_state["player_2_socket"] = socket
-        print('sending to ', socket, addr)
         answer(socket, addr)
         init()
 
@@ -119,9 +115,8 @@ def ball_init(right):
 
 
 def init():
-    print('Initializing...')
+    print('Initializing game...')
     room_state['state'] = 'running'
-    print('Room state set to', room_state['state'])
     room_state['winner'] = 0
     if random.randrange(0, 2) == 0:
         ball_init(True)
@@ -197,13 +192,12 @@ def run(room_id, state, socket):
                         update_paddle(data['player_id'], data['paddle_pos'])
         
         except Exception:
-            print('fuck')
+            print('Unknown exception!')
             #socket.sendto(str.encode('wat'), addr)
 
         # Updates game state 60 times per second
         if delta_time > TICK_RATE:
             #update
-            #print(f'Updating game room {room_id} with state {room_state}...')
             update(delta_time)
             #send state
             if room_state['state'] == 'running':

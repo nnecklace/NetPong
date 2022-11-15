@@ -38,15 +38,11 @@ class Session:
   # player paddle position and metadata
   def send(self, paddle_pos):
     # update game state based on received data
-    print("I'd love to send", self.n)
-    if self.state:
-      print(self.state)
     
     if self.mock != None:
       self.mock.update_paddle_pos(paddle_pos)
     else:
       if self.sock and self.state and (self.n == 1 and 'player_1_id' in self.state and self.state['player_1_id'] != 0):
-        print('sending updated player 1 pos')
         self.sock.sendto(str.encode(json.dumps({
           'message': 'update',
           'timestamp': time.time(),
@@ -57,7 +53,6 @@ class Session:
             }
           },)), (SERVER_IP, SERVER_PORT))
       elif self.sock and self.state and (self.n == 2 and 'player_2_id' in self.state and self.state['player_2_id'] != 0):
-        print('sending updated player 2 pos')
         self.sock.sendto(str.encode(json.dumps({
           'message': 'update',
           'timestamp': time.time(),
@@ -71,7 +66,6 @@ class Session:
   def get_state(self):
     if self.mock == None:
       game = GameState()
-      #print(self.state)
       if self.state != None:
         game.paddle_positions = self.state['paddle_positions']
         game.ball_pos = self.state['ball_pos']
@@ -86,7 +80,7 @@ class Session:
     self.stop = True
     self.sock.close()
     self.rec_thread.join()
-    print('quitting you fuck')
+    print('quitting')
 
   def init_connection(self, mode, room_id=0):
     print('initiating connection', mode, room_id)
@@ -97,6 +91,7 @@ class Session:
     if mode == 'join':
       print('connecting...')
       self.sock.sendto(str.encode(json.dumps({'message': 'connect', 'timestamp': time.time(), 'data': {'room_id': int(room_id)}})), (SERVER_IP, SERVER_PORT))
+      self.rec_thread.start()
       self.n = 2
 
   def rec(self):
@@ -104,7 +99,7 @@ class Session:
     while not self.stop:
       data, addr = self.sock.recvfrom(1024)
       packet = data.decode('utf-8')
-      print('INCOMING MESSAGE', packet)
+      #print('INCOMING MESSAGE', packet)
       packet = json.loads(packet)
       self.state = packet
       
